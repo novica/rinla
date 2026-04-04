@@ -93,7 +93,7 @@ jobs:
           fi
 
           git commit -m "Sync rinla from r-inla ${TAG}"
-          git push origin "$BRANCH"
+          git push --force origin "$BRANCH"
 
           gh pr create \
             --title "Sync: r-inla ${TAG}" \
