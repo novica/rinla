@@ -1,15 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-[!IMPORTANT]
-This is work in progress.
-This repository is an attempt to make a standalone r-inla package so that it can be served from places like Posit Package Manager and potentially CRAN.
-Current status:
-- `inst` folder has a bunch of symlinks that probably can be avoided, currently these are copied over from the parent repo;
-- an R file ('likelihood.R') is missing from the Collate: in DESCRIPTION;
-- `tidyterra` and `inlabru` missing as dependencies when building vignettes;
-- vignettes fail to build (trying on ubuntu 25.10, but there is no inla binary for that version).
-- tests run but many fail `[ FAIL 10 | WARN 0 | SKIP 0 | PASS 20 ]`
+> [!IMPORTANT]
+> This is work in progress.
+> This repository is an attempt to make a standalone r-inla package so that it can be served from places like Posit Package Manager and potentially CRAN.
+> Current status 2026-04-04:
+> - `inst` folder has a bunch of symlinks that probably can be avoided, currently these are copied over from the parent repo;
+> - an R file ('likelihood.R') is missing from the Collate: in DESCRIPTION;
+> - `tidyterra` and `inlabru` missing as dependencies when building vignettes;
+> - vignettes fail to build (trying on ubuntu 25.10, but there is no inla binary for that version).
+> - tests run but many fail `[ FAIL 10 | WARN 0 | SKIP 0 | PASS 20 ]`
 
 
 
