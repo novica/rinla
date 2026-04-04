@@ -12,7 +12,7 @@ Authors@R: c(
     person("Geir-Arne", "Fuglstad", email = "geirarne.fulgstad@gmail.com", role = "ctb"),
     person("Cristian", "Chiuchiolo", email = "cristian.chiuchiolo@kaust.edu.sa", role = "ctb"))
 Description: Full Bayesian analysis of latent Gaussian models using Integrated Nested Laplace Approximaxion. It is a front-end to the inla-program.
-Additional_repositories: http://inlabru-org.r-universe.dev/
+Additional_repositories: https://inlabru-org.r-universe.dev/
 Depends:
     R (>= 3.5),
     Matrix (>= 1.3-0)
@@ -31,43 +31,57 @@ Imports:
     MatrixModels
 Suggests:
     compositions,
-    Deriv,
-    Ecdat,
-    Rgraphviz,
     deldir,
+    Deriv,
     devtools,
+    DOYPAColors,
     doParallel,
     dplyr,
+    Ecdat,
     evd,
     fastGHQuad,
     fields,
+    formatR,
+    ggOceanMaps,
     ggplot2,
     ggpubr,
-    gsl,
     graph,
     gridExtra,
+    gsl,
+    inlabru,
+    INLAspacetime,
     knitr,
+    lattice,
+    maps,
     markdown,
     MASS,
     matrixStats,
+    mgcv,
     mlogit,
     mvtnorm,
     numDeriv,
     pixmap,
+    pracma,
+    Rgraphviz,
     rgl,
     rmarkdown,
+    rnaturalearth,
     runjags,
+    s2,
+    scales,
     sf,
     shiny,
     sn,
     sp (>= 1.6-0),
     spdep,
+    spatstat,
     splancs,
     terra,
-    tidyterra,
     testthat,
+    tidyr,
+    tidyterra,
     tools,
-    INLAspacetime
+    XML
 VignetteBuilder: knitr
 BuildVignettes: true
 LazyData: true

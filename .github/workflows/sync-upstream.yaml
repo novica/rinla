@@ -79,6 +79,8 @@ jobs:
           rsync -aL --delete \
             --exclude='.git' \
             --exclude='.github' \
+            --exclude='README.md' \
+            --exclude='README.Rmd' \
             /tmp/r-inla/rinla/ ./
 
       - name: Create pull request

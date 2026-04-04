@@ -41,6 +41,8 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - uses: r-lib/actions/setup-tinytex@v2
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
@@ -53,10 +55,12 @@ jobs:
           VERSION=$(grep '^Version:' DESCRIPTION | awk '{print $2}')
           ARCH=$(uname -m)
           BASE="https://inla.r-inla-download.org/Linux-builds"
-          FILE=$(curl -sf "${BASE}/FILES" \
-            | grep "Ubuntu-24.04" | grep "Version_${VERSION}" \
-            | { [ "$ARCH" = "aarch64" ] && grep "aarch64" || grep -v "aarch64"; } \
-            | head -1)
+          ALL_FILES=$(curl -sf "${BASE}/FILES")
+          if [ "$ARCH" = "aarch64" ]; then
+            FILE=$(echo "$ALL_FILES" | grep "Ubuntu-24.04" | grep "Version_${VERSION}" | grep "aarch64" | head -1 || true)
+          else
+            FILE=$(echo "$ALL_FILES" | grep "Ubuntu-24.04" | grep "Version_${VERSION}" | grep -v "aarch64" | head -1 || true)
+          fi
           if [ -z "$FILE" ]; then
             echo "::warning::No Linux binary found for version ${VERSION}"
             exit 0
@@ -74,7 +78,7 @@ jobs:
           BASE="https://inla.r-inla-download.org/Mac-builds"
           PATTERN=$([ "$ARCH" = "arm64" ] && echo "arm64" || echo "x86_64")
           BIN_DIR=$([ "$ARCH" = "arm64" ] && echo "inst/bin/mac.arm64" || echo "inst/bin/mac")
-          FILE=$(curl -sf "${BASE}/FILES" | grep "Version_${VERSION}" | grep "${PATTERN}" | head -1)
+          FILE=$(curl -sf "${BASE}/FILES" | grep "Version_${VERSION}" | grep "${PATTERN}" | head -1 || true)
           if [ -z "$FILE" ]; then
             echo "::warning::No macOS binary found for version ${VERSION} (${ARCH})"
             exit 0
