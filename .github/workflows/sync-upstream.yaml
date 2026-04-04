@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout rinla
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get latest tag from r-inla
         id: upstream
