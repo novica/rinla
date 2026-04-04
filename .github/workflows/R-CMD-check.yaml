@@ -18,11 +18,13 @@ jobs:
       fail-fast: false
       matrix:
         config:
-#          - {os: macos-latest,   r: 'release'}
-#          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: macos-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+#          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+#          - {os: ubuntu-latest,   r: 'oldrel-1'}
+#          * deps::.: Can't install dependency gsl
+#          * gsl: Needs R >= 4.5.0
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -41,19 +43,58 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, any::devtools
+          extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Install INLA binary (Linux only)
+      - name: Install INLA binary (Linux)
         if: runner.os == 'Linux'
-        shell: Rscript {0}
+        shell: bash
         run: |
-          devtools::install(".", quick = TRUE, upgrade = "never", quiet = TRUE)
-          library(INLA)
-          INLA::inla.binary.install(os = "Ubuntu-24.04")
-          pa <- searchpaths()
-          pa <- pa[grep("/INLA$", pa)]
-          file.copy(file.path(pa, "bin", "linux"), "inst/bin/", recursive = TRUE, overwrite = TRUE)
+          VERSION=$(grep '^Version:' DESCRIPTION | awk '{print $2}')
+          ARCH=$(uname -m)
+          BASE="https://inla.r-inla-download.org/Linux-builds"
+          FILE=$(curl -sf "${BASE}/FILES" \
+            | grep "Ubuntu-24.04" | grep "Version_${VERSION}" \
+            | { [ "$ARCH" = "aarch64" ] && grep "aarch64" || grep -v "aarch64"; } \
+            | head -1)
+          if [ -z "$FILE" ]; then
+            echo "::warning::No Linux binary found for version ${VERSION}"
+            exit 0
+          fi
+          FILE_ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe='/'))" "$FILE")
+          mkdir -p inst/bin/linux
+          curl -Lf "${BASE}/${FILE_ENC}" | tar -xz -C inst/bin/linux/
+
+      - name: Install INLA binary (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          VERSION=$(grep '^Version:' DESCRIPTION | awk '{print $2}')
+          ARCH=$(uname -m)
+          BASE="https://inla.r-inla-download.org/Mac-builds"
+          PATTERN=$([ "$ARCH" = "arm64" ] && echo "arm64" || echo "x86_64")
+          BIN_DIR=$([ "$ARCH" = "arm64" ] && echo "inst/bin/mac.arm64" || echo "inst/bin/mac")
+          FILE=$(curl -sf "${BASE}/FILES" | grep "Version_${VERSION}" | grep "${PATTERN}" | head -1)
+          if [ -z "$FILE" ]; then
+            echo "::warning::No macOS binary found for version ${VERSION} (${ARCH})"
+            exit 0
+          fi
+          mkdir -p "$BIN_DIR"
+          curl -Lf "${BASE}/${FILE}" | tar -xz -C "$BIN_DIR/"
+
+      - name: Install INLA binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $VERSION = (Select-String '^Version:' DESCRIPTION).Line.Split()[1]
+          $URL = "https://inla.r-inla-download.org/Windows-builds/windows64/Version_${VERSION}/64bit.zip"
+          try {
+            Invoke-WebRequest -Uri $URL -OutFile "$env:TEMP\inla-win.zip" -ErrorAction Stop
+            New-Item -ItemType Directory -Force -Path "inst\bin\windows" | Out-Null
+            Expand-Archive -Path "$env:TEMP\inla-win.zip" -DestinationPath "inst\bin\windows\" -Force
+          } catch {
+            Write-Warning "No Windows binary found for version ${VERSION}: $_"
+          }
 
       - uses: r-lib/actions/check-r-package@v2
         with:
