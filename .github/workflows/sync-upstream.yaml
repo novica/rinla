@@ -19,7 +19,7 @@ jobs:
       - name: Get latest tag from r-inla
         id: upstream
         run: |
-          LATEST_TAG=$(gh api repos/novica/r-inla/tags --jq '.[0].name')
+          LATEST_TAG=$(gh api repos/novica/r-inla/tags --jq '[.[] | select(.name | startswith("Version"))][0].name')
           echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ github.token }}
