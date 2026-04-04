@@ -7,11 +7,13 @@ on:
 
 name: Pkgdown
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
-    concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
@@ -30,11 +32,26 @@ jobs:
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
+          cache-version: 1
 
-      - name: Install INLA binary
+      - name: Get package version
+        id: pkg-version
         shell: bash
         run: |
-          VERSION=$(grep '^Version:' DESCRIPTION | awk '{print $2}')
+          echo "version=$(grep '^Version:' DESCRIPTION | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+      - name: Cache INLA binary
+        id: cache-inla
+        uses: actions/cache@v4
+        with:
+          path: inst/bin/linux
+          key: inla-binary-linux-${{ runner.arch }}-${{ steps.pkg-version.outputs.version }}
+
+      - name: Install INLA binary
+        if: steps.cache-inla.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          VERSION="${{ steps.pkg-version.outputs.version }}"
           ARCH=$(uname -m)
           BASE="https://inla.r-inla-download.org/Linux-builds"
           ALL_FILES=$(curl -sf "${BASE}/FILES")

@@ -2,6 +2,8 @@
 
 [![R-CMD-check](https://github.com/novica/rinla/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/novica/rinla/actions/workflows/R-CMD-check.yaml)
 [![Sync from upstream](https://github.com/novica/rinla/actions/workflows/sync-upstream.yaml/badge.svg)](https://github.com/novica/rinla/actions/workflows/sync-upstream.yaml)
+[![Pkgdown](https://github.com/novica/rinla/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/novica/rinla/actions/workflows/pkgdown.yaml)
+[![Test coverage](https://github.com/novica/rinla/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/novica/rinla/actions/workflows/test-coverage.yaml)
 
 > **This is an unofficial repository, not affiliated with or endorsed by the R-INLA project.**
 > The official project is at [r-inla.org](https://www.r-inla.org).

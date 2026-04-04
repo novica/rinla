@@ -8,6 +8,10 @@ on:
 
 name: R-CMD-check
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
@@ -47,12 +51,27 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
+          cache-version: 1
 
-      - name: Install INLA binary (Linux)
-        if: runner.os == 'Linux'
+      - name: Get package version
+        id: pkg-version
         shell: bash
         run: |
-          VERSION=$(grep '^Version:' DESCRIPTION | awk '{print $2}')
+          echo "version=$(grep '^Version:' DESCRIPTION | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+      - name: Cache INLA binary (Linux)
+        if: runner.os == 'Linux'
+        id: cache-inla-linux
+        uses: actions/cache@v4
+        with:
+          path: inst/bin/linux
+          key: inla-binary-linux-${{ runner.arch }}-${{ steps.pkg-version.outputs.version }}
+
+      - name: Install INLA binary (Linux)
+        if: runner.os == 'Linux' && steps.cache-inla-linux.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          VERSION="${{ steps.pkg-version.outputs.version }}"
           ARCH=$(uname -m)
           BASE="https://inla.r-inla-download.org/Linux-builds"
           ALL_FILES=$(curl -sf "${BASE}/FILES")
@@ -74,11 +93,21 @@ jobs:
             cp inst/bin/linux/64bit/inla.run inst/bin/linux/64bit/inla.mkl
           fi
 
-      - name: Install INLA binary (macOS)
+      - name: Cache INLA binary (macOS)
         if: runner.os == 'macOS'
+        id: cache-inla-macos
+        uses: actions/cache@v4
+        with:
+          path: |
+            inst/bin/mac
+            inst/bin/mac.arm64
+          key: inla-binary-macos-${{ runner.arch }}-${{ steps.pkg-version.outputs.version }}
+
+      - name: Install INLA binary (macOS)
+        if: runner.os == 'macOS' && steps.cache-inla-macos.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          VERSION=$(grep '^Version:' DESCRIPTION | awk '{print $2}')
+          VERSION="${{ steps.pkg-version.outputs.version }}"
           ARCH=$(uname -m)
           BASE="https://inla.r-inla-download.org/Mac-builds"
           PATTERN=$([ "$ARCH" = "arm64" ] && echo "arm64" || echo "x86_64")
@@ -91,11 +120,19 @@ jobs:
           mkdir -p "$BIN_DIR"
           curl -Lf "${BASE}/${FILE}" | tar -xz -C "$BIN_DIR/"
 
-      - name: Install INLA binary (Windows)
+      - name: Cache INLA binary (Windows)
         if: runner.os == 'Windows'
+        id: cache-inla-windows
+        uses: actions/cache@v4
+        with:
+          path: inst/bin/windows
+          key: inla-binary-windows-${{ runner.arch }}-${{ steps.pkg-version.outputs.version }}
+
+      - name: Install INLA binary (Windows)
+        if: runner.os == 'Windows' && steps.cache-inla-windows.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
-          $VERSION = (Select-String '^Version:' DESCRIPTION).Line.Split()[1]
+          $VERSION = "${{ steps.pkg-version.outputs.version }}"
           $URL = "https://inla.r-inla-download.org/Windows-builds/windows64/Version_${VERSION}/64bit.zip"
           try {
             Invoke-WebRequest -Uri $URL -OutFile "$env:TEMP\inla-win.zip" -ErrorAction Stop
