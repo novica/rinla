@@ -254,6 +254,43 @@
                     pdf = "crw2"
                 ),
 
+                prw2 = list(
+                    doc = "Proper random walk of order 2",
+                    hyper = list(
+                        theta1 = list(
+                            hyperid = 6103,
+                            name = "log precision",
+                            short.name = "prec",
+                            prior = "pc.prec",
+                            param = c(1, 0.01),
+                            initial = 4,
+                            fixed = FALSE,
+                            to.theta = function(x) log(x),
+                            from.theta = function(x) exp(x)
+                        ), 
+                        theta2 = list(
+                            hyperid = 6102,
+                            name = "log range",
+                            short.name = "range",
+                            prior = "pc.prw2.range",
+                            param = c(0, 0, 0, 0),
+                            initial = 3,
+                            fixed = FALSE,
+                            to.theta = function(x) log(x),
+                            from.theta = function(x) exp(x)
+                        )
+                    ),
+                    constr = FALSE,
+                    nrow.ncol = FALSE,
+                    augmented = FALSE,
+                    aug.factor = 1L,
+                    aug.constr = NULL,
+                    n.div.by = NULL,
+                    n.required = FALSE,
+                    set.default.values = FALSE,
+                    pdf = "prw2"
+                ),
+
                 seasonal = list(
                     doc = "Seasonal model for time series",
                     hyper = list(
@@ -277,6 +314,7 @@
                     n.div.by = NULL,
                     n.required = FALSE,
                     set.default.values = FALSE,
+                    missing.values.warning = TRUE, 
                     pdf = "seasonal"
                 ),
 
@@ -614,6 +652,7 @@
                     n.div.by = NULL,
                     n.required = FALSE,
                     set.default.values = FALSE,
+                    missing.values.warning = TRUE, 
                     pdf = "ar1"
                 ),
 
@@ -788,6 +827,7 @@
                     n.div.by = NULL,
                     n.required = FALSE,
                     set.default.values = FALSE,
+                    missing.values.warning = TRUE, 
                     pdf = "ar"
                 ),
 
@@ -9388,7 +9428,6 @@
                     survival = FALSE,
                     discrete = TRUE,
                     link = c("default", "identity"), 
-                    status = "experimental", 
                     pdf = "fl"
                 ),
 
@@ -9773,6 +9812,290 @@
                             short.name = "beta10",
                             output.name = "beta10 for 0poissonS observations",
                             output.name.intern = "beta10 for 0poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        )
+                    ),
+                    survival = FALSE,
+                    discrete = TRUE,
+                    link = c("default", "logit", "loga", "cauchit", "probit", "cloglog", "ccloglog", "loglog",
+                             "log", "sslogit", "logitoffset", "quantile", "pquantile", "robit", "sn",
+                             "powerlogit"),
+                    link.simple = c("default", "log"), 
+                    pdf = "0inflated"
+                ), 
+
+                "1poisson" = list(
+                    doc = "New 1-inflated Poisson",
+                    hyper = list(
+                        theta1 = list(
+                            hyperid = 56401,
+                            name = "beta1",
+                            short.name = "beta1",
+                            output.name = "beta1 for 1poisson observations",
+                            output.name.intern = "beta1 for 1poisson observations",
+                            initial = -4,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(-4, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta2 = list(
+                            hyperid = 56402,
+                            name = "beta2",
+                            short.name = "beta2",
+                            output.name = "beta2 for 1poisson observations",
+                            output.name.intern = "beta2 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta3 = list(
+                            hyperid = 56403,
+                            name = "beta3",
+                            short.name = "beta3",
+                            output.name = "beta3 for 1poisson observations",
+                            output.name.intern = "beta3 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta4 = list(
+                            hyperid = 56404,
+                            name = "beta4",
+                            short.name = "beta4",
+                            output.name = "beta4 for 1poisson observations",
+                            output.name.intern = "beta4 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta5 = list(
+                            hyperid = 56405,
+                            name = "beta5",
+                            short.name = "beta5",
+                            output.name = "beta5 for 1poisson observations",
+                            output.name.intern = "beta5 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta6 = list(
+                            hyperid = 56406,
+                            name = "beta6",
+                            short.name = "beta6",
+                            output.name = "beta6 for 1poisson observations",
+                            output.name.intern = "beta6 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta7 = list(
+                            hyperid = 56407,
+                            name = "beta7",
+                            short.name = "beta7",
+                            output.name = "beta7 for 1poisson observations",
+                            output.name.intern = "beta7 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta8 = list(
+                            hyperid = 56408,
+                            name = "beta8",
+                            short.name = "beta8",
+                            output.name = "beta8 for 1poisson observations",
+                            output.name.intern = "beta8 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta9 = list(
+                            hyperid = 56409,
+                            name = "beta9",
+                            short.name = "beta9",
+                            output.name = "beta9 for 1poisson observations",
+                            output.name.intern = "beta9 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta10 = list(
+                            hyperid = 56410,
+                            name = "beta10",
+                            short.name = "beta10",
+                            output.name = "beta10 for 1poisson observations",
+                            output.name.intern = "beta10 for 1poisson observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        )
+                    ),
+                    survival = FALSE,
+                    discrete = TRUE,
+                    link = c("default", "log", "quantile"), 
+                    link.simple = c("default", "logit", "cauchit", "probit", "cloglog", "ccloglog"), 
+                    pdf = "0inflated"
+                ), 
+
+                "1poissonS" = list(
+                    doc = "New 1-inflated Poisson Swap",
+                    hyper = list(
+                        theta1 = list(
+                            hyperid = 56501,
+                            name = "beta1",
+                            short.name = "beta1",
+                            output.name = "beta1 for 1poissonS observations",
+                            output.name.intern = "beta1 for 1poissonS observations",
+                            initial = -4,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(-4, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta2 = list(
+                            hyperid = 56502,
+                            name = "beta2",
+                            short.name = "beta2",
+                            output.name = "beta2 for 1poissonS observations",
+                            output.name.intern = "beta2 for 1poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta3 = list(
+                            hyperid = 56503,
+                            name = "beta3",
+                            short.name = "beta3",
+                            output.name = "beta3 for 1poissonS observations",
+                            output.name.intern = "beta3 for 1poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta4 = list(
+                            hyperid = 56504,
+                            name = "beta4",
+                            short.name = "beta4",
+                            output.name = "beta4 for 1poissonS observations",
+                            output.name.intern = "beta4 for 1poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta5 = list(
+                            hyperid = 56505,
+                            name = "beta5",
+                            short.name = "beta5",
+                            output.name = "beta5 for 1poissonS observations",
+                            output.name.intern = "beta5 for 1poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta6 = list(
+                            hyperid = 56506,
+                            name = "beta6",
+                            short.name = "beta6",
+                            output.name = "beta6 for 1poissonS observations",
+                            output.name.intern = "beta6 for 1poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta7 = list(
+                            hyperid = 56507,
+                            name = "beta7",
+                            short.name = "beta7",
+                            output.name = "beta7 for 1poissonS observations",
+                            output.name.intern = "beta7 for 1poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta8 = list(
+                            hyperid = 56508,
+                            name = "beta8",
+                            short.name = "beta8",
+                            output.name = "beta8 for 1poissonS observations",
+                            output.name.intern = "beta8 for 1poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta9 = list(
+                            hyperid = 56509,
+                            name = "beta9",
+                            short.name = "beta9",
+                            output.name = "beta9 for 1poissonS observations",
+                            output.name.intern = "beta9 for 1poissonS observations",
+                            initial = 0,
+                            fixed = FALSE,
+                            prior = "normal",
+                            param = c(0, 10),
+                            to.theta = function(x) x,
+                            from.theta = function(x) x
+                        ),
+                        theta10 = list(
+                            hyperid = 56510,
+                            name = "beta10",
+                            short.name = "beta10",
+                            output.name = "beta10 for 1poissonS observations",
+                            output.name.intern = "beta10 for 1poissonS observations",
                             initial = 0,
                             fixed = FALSE,
                             prior = "normal",
@@ -10749,7 +11072,6 @@
                             from.theta = function(x) x
                         )
                     ),
-                    status = "experimental", 
                     survival = FALSE,
                     discrete = TRUE,
                     link = c("default", "logit", "probit"), 
@@ -11269,6 +11591,30 @@
                     discrete = FALSE,
                     link = c("default", "log"),
                     pdf = "mgamma"
+                ),
+
+                gammasv = list(
+                    doc = "The Gamma likelihood with constant rate",
+                    hyper = list(
+                        theta = list(
+                            hyperid = 58003,
+                            name = "precision parameter",
+                            short.name = "prec",
+                            output.name = "Precision-parameter for the Gammasv observations",
+                            output.name.intern = "Intern precision-parameter for the Gammasv observations",
+                            initial = log(100),
+                            fixed = FALSE,
+                            prior = "loggamma",
+                            param = c(1, 0.01),
+                            to.theta = function(x) log(x),
+                            from.theta = function(x) exp(x)
+                        )
+                    ),
+                    status = "experimental", 
+                    survival = FALSE,
+                    discrete = FALSE,
+                    link = c("default", "log"),
+                    pdf = "gammasv"
                 ),
 
                 gammasurv = list(
@@ -12017,7 +12363,6 @@
                             from.theta = function(x) exp(x)
                         )
                     ),
-                    status = "experimental", 
                     survival = FALSE,
                     discrete = FALSE,
                     link = c("default", "logit", "loga", "cauchit", "probit", "cloglog", "ccloglog", "loglog"),
@@ -12623,7 +12968,6 @@
                             from.theta = function(x) 1+exp(x)
                         )
                     ),
-                    status = "experimental", 
                     survival = FALSE,
                     discrete = FALSE,
                     link = c("default", "identity", "quantile"), 
@@ -12914,7 +13258,6 @@
                             from.theta = function(x) x
                         )
                     ),
-                    status = "experimental", 
                     survival = FALSE,
                     discrete = TRUE,
                     link = c("default", "log"), 
@@ -13002,8 +13345,7 @@
                     survival = FALSE,
                     discrete = FALSE,
                     link = c("default", "identity"),
-                    pdf = "iidgamma",
-                    status = "experimental"
+                    pdf = "iidgamma"
                 ),
 
                 iidlogitbeta = list(
@@ -13039,8 +13381,7 @@
                     survival = FALSE,
                     discrete = FALSE,
                     link = c("default", "logit", "loga"),
-                    pdf = "iidlogitbeta",
-                    status = "experimental"
+                    pdf = "iidlogitbeta"
                 ),
 
                 loggammafrailty = list(
@@ -13063,8 +13404,7 @@
                     survival = FALSE,
                     discrete = FALSE,
                     link = c("default", "identity"),
-                    pdf = "loggammafrailty",
-                    status = "experimental"
+                    pdf = "loggammafrailty"
                 ),
 
                 logistic = list(
@@ -15445,7 +15785,6 @@
                             from.theta = function(x) exp(x)
                         )
                     ),
-                    status = "experimental", 
                     survival = FALSE,
                     discrete = FALSE,
                     link = c("default", "quantile"),
@@ -15820,10 +16159,70 @@
                         )
                     ),
                     experimental = TRUE, 
+                    status = "disabled", 
                     survival = FALSE,
                     discrete = FALSE,
-                    link = c("default", "circular", "tan", "tan.pi", "identity"),
+                    link = c("default", "circular", "tan", "identity"),
                     pdf = "vm"
+                ),
+
+                nvm = list(
+                    doc = "Normal approx of the von Mises circular distribution",
+                    hyper = list(
+                        theta = list(
+                            hyperid = 109201,
+                            name = "precision",
+                            short.name = "prec",
+                            output.name.intern = "prec_intern for nvm", 
+                            output.name = "precision parameter for nvm", 
+                            initial = 2,
+                            fixed = FALSE,
+                            prior = "loggamma",
+                            param = c(1, 0.01),
+                            to.theta = function(x) log(x), 
+                            from.theta = function(x) exp(x)
+                        )
+                    ),
+                    experimental = TRUE, 
+                    status = "disabled", 
+                    survival = FALSE,
+                    discrete = FALSE,
+                    link = c("default", "circular", "tan", "identity"),
+                    pdf = "vm"
+                ),
+
+                lavm = list(
+                    doc = "Link adjusted von Mises circular distribution",
+                    hyper = list(
+                        theta = list(
+                            hyperid = 109301,
+                            name = "precision",
+                            short.name = "prec",
+                            output.name.intern = "prec_intern for lavm", 
+                            output.name = "precision parameter for lavm", 
+                            initial = 2,
+                            fixed = FALSE,
+                            prior = "loggamma",
+                            param = c(1, 0.01),
+                            to.theta = function(x) log(x), 
+                            from.theta = function(x) exp(x)
+                        )
+                    ),
+                    experimental = TRUE, 
+                    survival = FALSE,
+                    discrete = FALSE,
+                    link = c("default", "circular", "tan", "identity"),
+                    pdf = "lavm"
+                ),
+
+                cloglike = list(
+                    doc = "User-defined likelihood",
+                    hyper = list(),
+                    experimental = TRUE, 
+                    survival = FALSE,
+                    discrete = FALSE,
+                    link = c("default", "identity"),
+                    pdf = "cloglike"
                 )
             )
     )
@@ -15887,6 +16286,11 @@
                     doc = "Gamma prior",
                     nparameters = 2L,
                     pdf = "prior-loggamma"
+                ),
+                pc.prw2.range = list(
+                    doc = "PCprior for the range in PRW2",
+                    nparameters = 4L,
+                    pdf = "pc.prw2.range"
                 ),
                 minuslogsqrtruncnormal = list(
                     doc = "(obsolete)",
@@ -16092,7 +16496,6 @@
                 
                 "rprior:" = list(
                     doc = "A R-function defining the prior",
-                    status = "experimental", 
                     nparameters = 0L,
                     pdf = "rprior"
                 )

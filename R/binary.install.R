@@ -33,6 +33,7 @@
                                          "CentOS Stream-8", 
                                          "Rocky Linux-8", 
                                          "Rocky Linux-9", 
+                                         "Rocky Linux-10", 
                                          "Manjaro Linux-", 
                                          "Fedora-33", 
                                          "Fedora-34", 
@@ -43,11 +44,16 @@
                                          "Fedora Linux-39", 
                                          "Fedora Linux-40", 
                                          "Fedora Linux-41", 
+                                         "Fedora Linux-42", 
+                                         "Fedora Linux-43", 
+                                         "Fedora Linux-44", 
                                          "Ubuntu-16.04", 
                                          "Ubuntu-18.04", 
                                          "Ubuntu-20.04", 
                                          "Ubuntu-22.04",
-                                         "Ubuntu-24.04"),
+                                         "Ubuntu-24.04",
+                                         "Ubuntu-25.04", 
+                                         "Ubuntu-26.04"), 
                                   path = NULL, 
                                   verbose = TRUE,
                                   md5.check = TRUE,
@@ -76,9 +82,19 @@
     ff <- readLines(fp)
     close(fp)
     ff <- ff[grep(version, ff)]
-    nf <- length(ff)
 
     if (is.null(os)) {
+        ## filter on this one
+        aa <- "aarch64"
+        if (inla.one.of(R.version$arch, aa)) {
+            ff <- ff[grep(aa, ff)]
+        } else {
+            if (length(grep(aa, ff)) > 0) {
+                ff <- ff[-grep(aa, ff)]
+            }
+        }
+        nf <- length(ff)
+
         cat("  Available alternatives:\n")
         for (i in seq_len(nf)) {
             cat("  \t", paste0("Alternative ", i), " is ", ff[i], "\n")
@@ -195,9 +211,8 @@
     show("Done!")
 
     if (external.path) {
-        cat("* Examples of usage:\n")
+        cat("* Example of usage:\n")
         cat("* \tinla.setOption(inla.call = \"", paste0(from.dir, "/inla.mkl.run"), "\")\n")
-        cat("* \tinla.setOption(fmesher.call = \"", paste0(from.dir, "/fmesher.run"), "\")\n")
     }
 
     return(invisible(TRUE))

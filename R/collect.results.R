@@ -597,15 +597,6 @@
                 }
                 colnames(gcpodens.moments) <- c("mean", "variance", "log.theta.correction")
                 
-                arg.str <- NULL
-                have.arg.str <- readBin(fp, numeric(), 1)
-                if (have.arg.str > 0) {
-                    arg.str <- vector('character', configs$Npred)
-                    for (i in 1:configs$Npred) {
-                        arg.str[i] <- readBin(fp, character(), 1)
-                    }
-                }
-
                 ll.info <- NULL
                 have.ll.info <- readBin(fp, numeric(), 1)
                 if (have.ll.info > 0) {
@@ -690,7 +681,6 @@
                     ),
                     cpodens.moments = cpodens.moments,
                     gcpodens.moments = gcpodens.moments,
-                    arg.str = arg.str,
                     ll.info = ll.info,
                     APredictor = A.lpred.mean.variance, 
                     Predictor = lpred.mean.variance
@@ -723,6 +713,7 @@
         niter <- readBin(fp, integer(), 1)
         nfuncs <- readBin(fp, integer(), niter)
         fs <- readBin(fp, double(), niter)
+        wtimes <- readBin(fp, double(), niter)
         theta <- readBin(fp, double(), niter * nt)
         close(fp)
 
@@ -731,7 +722,8 @@
         rownames(theta) <- paste0("iter", seq_len(niter))
         names(nfuncs) <- paste0("iter", seq_len(niter))
         names(fs) <- paste0("iter", seq_len(niter))
-        opt.trace <- list(f = fs, nfunc = nfuncs, theta = theta)
+        names(wtimes) <- paste0("wtime", seq_len(niter))
+        opt.trace <- list(f = fs, wtime = wtimes, nfunc = nfuncs, theta = theta)
     } else {
         opt.trace <- NULL
     }
@@ -1112,16 +1104,21 @@
             cat(paste0("collect gcpo\n"))
         }
 
+        type.cv <- readLines(paste0(results.dir, .Platform$file.sep, "gcpo", .Platform$file.sep, "type.dat"))[1]
         xx <- inla.read.binary.file(file = paste0(results.dir, .Platform$file.sep, "gcpo", .Platform$file.sep, "gcpo.dat"))
         n <- xx[1L]
         xx <- xx[-1L]
 
         values <- xx[1:n]
         values[is.nan(values)] <- NA
-        kld <- xx[n + 1:n]
-        mean <- xx[2 * n + 1:n]
-        sd <- xx[3 * n + 1:n]
-        offset <- 4 * n
+
+        pit.values <- xx[n + 1:n]
+        pit.values[is.nan(pit.values)] <- NA
+
+        kld <- xx[2 * n + 1:n]
+        mean <- xx[3 * n + 1:n]
+        sd <- xx[4 * n + 1:n]
+        offset <- 5 * n
         groups <- rep(list(list()), n)
         for(i in 1:n) {
             nn <- xx[offset + 1]
@@ -1137,13 +1134,15 @@
         }
     } else {
         values <- NULL
+        pit.values <- NULL
         kld <- NULL
         mean <- NULL
         sd <- NULL
         groups <- NULL
+        type.cv <- NULL
     }
 
-    return(list(gcpo = values, kld = kld, mean = mean, sd = sd, groups = groups))
+    return(list(gcpo = values, pit = pit.values, kld = kld, mean = mean, sd = sd, groups = groups, type.cv = type.cv))
 }
 
 `inla.collect.cpo` <- function(results.dir, debug = FALSE)
@@ -1959,7 +1958,7 @@
                     names.rr <- names(rr)
                     for (j in 1L:nd) {
                         colnames(rr[[j]]) <- c("x", "y")
-                        }
+                    }
                 }
                 marginals.random[[i]] <- if (is.null(rr)) NA_real_ else rr
 
@@ -1968,9 +1967,9 @@
                 if (!is.null(id.names)) {
                     len.id.names <- length(id.names)
                     summary.random[[i]]$ID[1L:len.id.names] <- id.names
-                    # Check for existing marginals.random[[i]] data:
-                    # Cannot use is.na() directly, since the result must
-                    # always be a single logical value.
+                    ## Check for existing marginals.random[[i]] data:
+                    ## Cannot use is.na() directly, since the result must
+                    ## always be a single logical value.
                     if (length(marginals.random) >= i && !is.null(rr)) {
                         names(marginals.random[[i]][1L:len.id.names]) <- id.names
                     }
@@ -1985,17 +1984,9 @@
                 summary.random[[i]] <- data.frame("mean" = rep(NA, N), "sd" = rep(NA, N), "kld" = rep(NA, N))
                 marginals.random <- NULL
             }
-
             size.random[[i]] <- inla.collect.size(file)
         }
         names(summary.random) <- names.random
-
-        ## could be that marginals.random is a list of lists of NULL or NA
-        if (!is.null(marginals.random)) {
-            if (all(sapply(marginals.random, function(x) is.null(x) || all(is.na(unlist(x)))))) {
-                marginals.random <- NULL
-            }
-        }
         if (!is.null(marginals.random) && (length(marginals.random) > 0L)) {
             names(marginals.random) <- names.random
         }

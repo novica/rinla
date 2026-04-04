@@ -287,11 +287,11 @@ plot.inla.trimesh <- function(x, S, color = NULL, color.axis = NULL,
 #' @export
 plot.inla.mesh <- function(x,
                            col = "white",
-                           t.sub = 1:nrow(mesh$graph$tv),
+                           t.sub = 1:nrow(x$graph$tv),
                            add = FALSE,
                            lwd = 1,
-                           xlim = range(mesh$loc[, 1]),
-                           ylim = range(mesh$loc[, 2]),
+                           xlim = range(x$loc[, 1]),
+                           ylim = range(x$loc[, 2]),
                            main = NULL,
                            rgl = FALSE,
                            size = 2,
@@ -963,7 +963,7 @@ inla.mesh.query <- function(mesh, ...) {
     details = "Does not yet have an `fmesher` alternative."
   )
 
-  inla.require.inherits(mesh, "inla.mesh", "'mesh'")
+  inla.require.inherits(mesh, "fm_mesh_2d", "'mesh'")
 
   not.known <- function(mesh, queryname) {
     stop(paste("Query '", queryname,
@@ -1111,7 +1111,6 @@ summary.inla.mesh <- function(object, verbose = FALSE, ...) {
   if (verbose) {
     ret <- (c(ret, list(
       call = x$meta$call,
-      fmesher.args = x$meta$fmesher.args,
       prefix = x$meta$prefix,
       time = x$meta$time,
       is.refined = x$meta$is.refined
@@ -1187,7 +1186,6 @@ print.summary.inla.mesh <- function(x, ...) {
     cat("\nCall:\n")
     print(x$call)
 
-    cat("\nfmesher:\t", x$fmesher.args, "\n", sep = "")
     cat("prefix:\t\t", x$prefix, "\n", sep = "")
 
     cat("\nTimings:\n")
@@ -1978,7 +1976,7 @@ inla.nonconvex.hull <- function(points,
 #' @export
 #' @describeIn inla.nonconvex.hull
 #' `r lifecycle::badge("deprecated")` since `23.08.18`
-#' Use [fmesher::fm_nonconvex_hull_inla_basic()] instead.
+#' Use [fmesher::fm_nonconvex_hull()] with `concave = 0` instead.
 ## Based on an idea from Elias Teixeira Krainski
 ## Requires  splancs::nndistF
 inla.nonconvex.hull.basic <- function(points,
@@ -1992,14 +1990,17 @@ inla.nonconvex.hull.basic <- function(points,
     "23.08.18",
     "inla.nonconvex.hull.basic()",
     I(paste0(
-      "`fmesher::fm_nonconvex_hull(concave = 0)`"
+      "`fmesher::fm_nonconvex_hull(concave = 0, format = 'fm', method = 'fm')`"
     ))
   )
-  return(fmesher::fm_nonconvex_hull_inla_basic(
+  return(fmesher::fm_nonconvex_hull(
     x = points,
     convex = convex,
+    concave = 0,
     resolution = resolution,
     eps = eps,
-    crs = crs
+    crs = crs,
+    format = "fm",
+    method = "fm"
   ))
 }

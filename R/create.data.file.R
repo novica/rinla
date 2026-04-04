@@ -91,11 +91,14 @@
                                 "simplex",
                                 "gamma",
                                 "mgamma",
+                                "gammasv",
                                 "beta",
                                 "obeta", 
                                 "tweedie",
                                 "fmri",
-                                "vm"))) {
+                                "lavm",
+                                "vm",
+                                "nvm"))) {
         if (is.null(scale)) {
             scale <- rep(1.0, n.data)
         }
@@ -626,7 +629,7 @@
             my.stop(paste0("family:", family, ". NA's in argument 'OFFSET', are not allowed"))
         }
 
-    } else if (inla.one.of(family, c("0poisson", "0poissonS", "0binomial", "0binomialS"))) {
+    } else if (inla.one.of(family, c("0poisson", "0poissonS", "0binomial", "0binomialS", "1poisson", "1poissonS"))) {
 
         response <- cbind(ind, y.orig)
         na.dat <- is.na(response[, 2L])
@@ -705,6 +708,20 @@
                           ##  this one is just fake
                           y = matrix(0, ncol = 1, nrow = length(response$IDX))) 
         colnames(response) <- c("IDX", paste0("Y", 1:ny), paste0("X", 1:m), "y")
+
+    } else if (inla.one.of(family, c("cloglike"))) {
+
+        stopifnot(y.attr[1] == 1)
+        ny <- y.attr[2]
+        stopifnot(ny > 0)
+
+        response <- cbind(IDX = ind, y.orig)
+        idx.all.na <- which(apply(y.orig[,  1:ny, drop = FALSE], 1, function(x) all(is.na(x))) == TRUE)
+        if (length(idx.all.na) > 0) {
+            response <- response[-idx.all.na,, drop = FALSE]
+        }
+        response <- cbind(IDX = response[, 1], Y = response[, 1 + 1:ny, drop = FALSE])
+        colnames(response) <- c("IDX", paste0("Y", 1:ny))
 
     } else if (inla.one.of(family, c("bgev"))) {
 

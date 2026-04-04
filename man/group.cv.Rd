@@ -20,7 +20,8 @@ inla.group.cv(
   prior.diagonal = 1e-04,
   keep = NULL,
   remove = NULL,
-  remove.fixed = TRUE
+  remove.fixed = TRUE,
+  type.cv = "single"
 )
 }
 \arguments{
@@ -57,7 +58,7 @@ groups. If given, each group beyond the observation itself, must be a subset of
 
 \item{friends}{An optional list of lists of indices to use a friends}
 
-\item{weights}{An optional positive weight attached to each datapoint. The sume
+\item{weights}{An optional positive weight attached to each datapoint. The sum
 of the weights define the size of the group. If \code{NULL}, then unit weight is
 used.}
 
@@ -83,6 +84,8 @@ defined.}
 which is in effect if both \code{keep} and \code{remove} are \code{NULL}. If
 \code{TRUE}, it will remove (or condition on) all fixed effects when
 computing the groups. See the vignette for details.}
+
+\item{type.cv}{Type of cv, either "single" (default) or "joint"}
 }
 \value{
 The object returned is list related to leave-group-out

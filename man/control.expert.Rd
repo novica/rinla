@@ -10,9 +10,10 @@ control.expert(
   cpo.idx = -1,
   disable.gaussian.check = FALSE,
   jp = NULL,
-  dot.product.gain = FALSE,
   globalconstr = list(A = NULL, e = NULL),
-  opt.solve = FALSE
+  opt.solve = FALSE,
+  opt.storage = FALSE,
+  opt.num.threads = TRUE
 )
 
 inla.set.control.expert.default(...)
@@ -29,16 +30,19 @@ Gaussian likelihood and identity link (default \code{FALSE})}
 
 \item{jp}{An object of class \code{inla.jp} defining a joint prior}
 
-\item{dot.product.gain}{Output the gain in
-optimizing dot-products? (Default \code{FALSE})}
-
 \item{globalconstr}{Add a global constraint (see \code{?f} and argument
 \code{extraconstr}). Note that a global constraint does NOT
 correct the normalisation constant.
 (EXPERIMENTAL OPTION)}
 
 \item{opt.solve}{Store also \code{L^T} to optimize linear solves (TAUCS only).
-(EXPERIMENTAL OPTION: DO NOT USE)}
+Might benefite larger models. (EXPERIMENTAL OPTION)}
+
+\item{opt.storage}{Make sure \code{L} is stored sequencially (TAUCS only).
+Might benefite larger models. (EXPERIMENTAL OPTION)}
+
+\item{opt.num.threads}{Reduce the number of threads adaptively if needed at
+critical places to optimize wall-clock time}
 
 \item{...}{Named arguments passed on to the main function}
 }

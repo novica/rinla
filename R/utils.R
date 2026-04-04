@@ -1,6 +1,19 @@
-## Nothing to export
+#' @title inla.tempdir
+#' @export
+#' @details Return the name, and create, a temporary directory for storing intermediate results.
+#'     This function is exported as it is also used by package `INLAjoint` (for details, check the `INLAjoint`
+#'     implementation)
+`inla.tempdir` <- function() {
+    ## just replace \ in Windows with /
+    t.dir <- tempfile()
+    inla.dir.create(t.dir)
+    return(gsub("\\\\", "/", t.dir))
+}
 
-## Various utility functions
+`inla.tempfile` <- function(pattern = "file", tmpdir = tempdir()) {
+    ## just replace \ in Windows with /
+    return(gsub("\\\\", "/", tempfile(pattern, tmpdir)))
+}
 
 `inla.numlen` <- function(x) {
     ## number of digits required to represent a integers 'x'
@@ -99,9 +112,6 @@
 }
 
 `inla.my.update` <- function(dir, binaries = FALSE, ignore.regexp = NULL) {
-    ## Set binaries=TRUE to set the inla.call and fmesher.call options
-    ## To override the default binaries path, set binaries="/the/path/bin"
-
     a <- inla.models()
     rm(a)
         
@@ -190,9 +200,13 @@
     cat("Source files in ", dir, ". Loaded ", length(files), " files and replaced ", nfuncs, " functions.\n", sep = "")
 
     if (binaries) {
-        inla.setOption("inla.call", path.expand(paste(bin.path, "/", "inla.mkl.run", sep = "" )))
-        inla.setOption("fmesher.call", path.expand(paste(bin.path, "/", "fmesher.run", sep = "")))
-        cat("Define new values for 'inla.call' and 'fmesher.call'\n", sep = "")
+        if (inla.one.of(R.version$arch, "aarch64")) {
+            inla.setOption("inla.call",
+                           path.expand(paste(bin.path, "/", "inla.run", sep = "")))
+        } else {
+            inla.setOption("inla.call",
+                           path.expand(paste(bin.path, "/", "inla.mkl.run", sep = "")))
+        }
     }
 
     ## hash the models again
@@ -452,7 +466,6 @@
     return(as.character(u))
 }
 
-
 `inla.eval` <- function(command,
                         envir = parent.frame(),
                         enclos = if (is.list(envir) || is.pairlist(envir)) {
@@ -462,19 +475,6 @@
                         }) {
     return(eval(parse(text = command), envir, enclos))
 }
-
-`inla.tempfile` <- function(pattern = "file", tmpdir = tempdir()) {
-    ## just replace \ in Windows with /
-    return(gsub("\\\\", "/", tempfile(pattern, tmpdir)))
-}
-
-`inla.tempdir` <- function() {
-    ## just replace \ in Windows with /
-    t.dir <- tempfile()
-    inla.dir.create(t.dir)
-    return(gsub("\\\\", "/", t.dir))
-}
-
 
 `inla.formula2character` <- function(formula) {
     ## convert a formula to characters without the 500 character
@@ -897,7 +897,8 @@
     inla.rw(n, order = 2L, ...)
 }
 
-`inla.rw` <- function(n, order = 1L, sparse = TRUE, scale.model = FALSE, cyclic = FALSE) {
+`inla.rw` <- function(n, order = 1L, sparse = TRUE, scale.model = FALSE, cyclic = FALSE, diag.add = 0.0) {
+    ## if diag.add > 0 && scale.model=T, then diag.add is added *after* scale.
     stopifnot(n >= 1L + 2L * order)
     if (scale.model) {
         if (!cyclic) {
@@ -923,6 +924,9 @@
             U <- t(U) %*% U
             Q <- toeplitz(c(U[k, k:m], rep(0.0, n - m), U[k, m:(k + 1L)]))
         }
+    }
+    if (diag.add > 0) {
+        Q <- Q + diag.add * Diagonal(n)
     }
     return(if (sparse) inla.as.sparse(Q) else Q)
 }

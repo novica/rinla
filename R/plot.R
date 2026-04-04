@@ -16,7 +16,7 @@
 #' @param plot.predictor Boolean indicating if posterior mean and quantiles for
 #' the linear predictor in the model should be plotted
 #' @param plot.q Boolean indicating if precision matrix should be displayed
-#' @param plot.cpo Boolean indicating if CPO/PIT valuesshould be plotted
+#' @param plot.cpo Boolean indicating if CPO/PIT values should be plotted
 #' @param plot.prior Plot also the prior density for the hyperparameters
 #' @param plot.opt.trace Plot optimization trace
 #' @param single Boolean indicating if there should be more than one plot per
@@ -751,12 +751,27 @@
             } else {
                 par(mfrow = c(1, 2))
             }
-            my.plot(x$misc$opt.trace$nfunc, x$misc$opt.trace$f - min(x$misc$opt.trace$f) + 1,
-                    log = "y", pch = 19, type = "l")
+
+            ## plot either wrt function evaluations or time
+            if (TRUE) {
+                my.plot(x$misc$opt.trace$nfunc, x$misc$opt.trace$f - min(x$misc$opt.trace$f) + 1,
+                        log = "y", pch = 19, type = "l")
+            } else {
+                my.plot(x$misc$opt.trace$wtime, x$misc$opt.trace$f - min(x$misc$opt.trace$f) + 1,
+                        log = "y", pch = 19, type = "l")
+            }
+
             if (single) {
                 close.and.new.plot(...)
             }
-            matplot(x$misc$opt.trace$nfunc, x$misc$opt.trace$theta, type = "l", lwd = 3)
+            
+            ## same here
+            if (TRUE) {
+                matplot(x$misc$opt.trace$nfunc, x$misc$opt.trace$theta, type = "l", lwd = 3)
+            } else {
+                matplot(x$misc$opt.trace$wtime, x$misc$opt.trace$theta, type = "l", lwd = 3)
+            }
+
             if (ncol(x$misc$opt.trace$theta) > 1) {
                 close.and.new.plot(...)
                 if (FALSE) {
@@ -781,9 +796,13 @@
                                    col = grey(seq(0.5, 0.0, len = m)))
                         }
                     }
+                    diag.trace <- function(x, ...) {
+                        lines(x, lwd = 3, ...)
+                    }
                     pairs(x$misc$opt.trace$theta, pch = 19,
                           upper.panel = panel.trace, 
                           lower.panel = panel.trace, 
+                          diag.panel = diag.trace, 
                           col = grey(seq(0.5, 0.0, len = m)))
                 }
             }
@@ -1057,6 +1076,13 @@ inla.get.prior.xy <- function(section = NULL, hyperid = NULL, all.hyper, debug =
     ## specified from within the R-interface and argument 'hyper'. the conversion to the prior
     ## density for the user-scale is done automatically.
 
+    my.pc.prw2.range <- function(theta, param, log = FALSE) {
+        r <- exp(theta)
+        dd <- log(inla.prw2.drange(r, param)) + theta
+        if (!log) dd <- exp(dd)
+        return (dd)
+    }
+
     my.pc.gevtail <- function(theta, param, log = FALSE) {
         dist <- function(xi, deriv = 0) {
             if (deriv == 0) {
@@ -1220,16 +1246,16 @@ inla.get.prior.xy <- function(section = NULL, hyperid = NULL, all.hyper, debug =
         to.theta <- inla.models()$latent$fgn$hyper$theta2$to.theta
         from.theta <- inla.models()$latent$fgn$hyper$theta2$from.theta
 
-        logdet.FGN.OLD <- function(H, n) {
-            ans <- c()
-            Hseq <- H
-            for (H in Hseq) {
-                r <- inla.acvfFGN(H, n - 1)
-                res <- HKprocess::ltzc(r, rep(0, n))
-                ans <- c(ans, as.numeric(res[2]))
-            }
-            return(ans)
-        }
+        ## logdet.FGN.OLD <- function(H, n) {
+        ##     ans <- c()
+        ##     Hseq <- H
+        ##     for (H in Hseq) {
+        ##         r <- inla.acvfFGN(H, n - 1)
+        ##         res <- HKprocess::ltzc(r, rep(0, n))
+        ##         ans <- c(ans, as.numeric(res[2]))
+        ##     }
+        ##     return(ans)
+        ## }
         logdet.FGN <- function(H, n) {
             ans <- c()
             Hseq <- H
@@ -1394,6 +1420,8 @@ inla.get.prior.xy <- function(section = NULL, hyperid = NULL, all.hyper, debug =
         }
         fun <- splinefun(x, theta)
         y <- exp(ld + log(abs(fun(x, deriv = 1))))
+
+        ## xy <- cbind(x, y); save(xy, file = "xy.dat")
     }
     return(list(x = x, y = y))
 }

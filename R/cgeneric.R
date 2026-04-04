@@ -33,21 +33,31 @@
         stop("The '...' argument in 'inla.cgeneric.define()' needs *named* arguments.")
     }
 
-    cmodel <- list(
-        f = list(
-            model = "cgeneric",
-            n = as.integer(n), 
-            cgeneric = list(
-                model = model, 
-                shlib = shlib, 
+    cmodel <- structure(
+        list(
+            f = list(
+                model = "cgeneric",
                 n = as.integer(n), 
-                debug = debug,
-                data = inla.cgeneric.convert.arguments(n = as.integer(n), model = model, shlib = shlib, debug = as.integer(debug), ...)
+                cgeneric = structure(
+                    list(
+                        model = model, 
+                        shlib = shlib, 
+                        n = as.integer(n), 
+                        debug = debug,
+                        data = inla.cgeneric.convert.arguments(
+                            n = as.integer(n),
+                            model = model,
+                            shlib = shlib,
+                            debug = as.integer(debug),
+                            ...
+                        )
+                    ),
+                    class = "inla.cgeneric.f"
+                )
             )
-        )
+        ),
+        class = "inla.cgeneric"
     )
-    class(cmodel) <- "inla.cgeneric"
-    class(cmodel$f$cgeneric) <- "inla.cgeneric"
     return(cmodel)
 }
 
@@ -91,7 +101,7 @@
 `inla.cgeneric.q` <- function(cmodel = NULL)
 {
     stopifnot(!is.null(cmodel))
-    stopifnot(inherits(cmodel$f$cgeneric, "inla.cgeneric"))
+    stopifnot(inherits(cmodel$f$cgeneric, "inla.cgeneric.f"))
 
     ## need to turn off warnings for the numerics-conversions in 'split()'
     opt <- options()

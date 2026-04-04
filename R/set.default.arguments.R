@@ -251,10 +251,6 @@
              #' @param jp An object of class `inla.jp` defining a joint prior
              jp = NULL,
 
-             #' @param dot.product.gain Output the gain in
-             #' optimizing dot-products? (Default `FALSE`)
-             dot.product.gain = FALSE,
-
              #' @param globalconstr Add a global constraint (see `?f` and argument
              #' `extraconstr`). Note that a global constraint does NOT
              #' correct the normalisation constant.
@@ -262,8 +258,16 @@
              globalconstr = list(A = NULL, e = NULL),
 
              #' @param opt.solve Store also `L^T` to optimize linear solves (TAUCS only).
-             #' (EXPERIMENTAL OPTION: DO NOT USE)
-             opt.solve = FALSE
+             #' Might benefite larger models. (EXPERIMENTAL OPTION)
+             opt.solve = FALSE, 
+   
+             #' @param opt.storage Make sure `L` is stored sequencially (TAUCS only).
+             #' Might benefite larger models. (EXPERIMENTAL OPTION)
+             opt.storage = FALSE, 
+   
+             #' @param opt.num.threads Reduce the number of threads adaptively if needed at
+             #' critical places to optimize wall-clock time
+             opt.num.threads = TRUE
              ) {
         ctrl_object(as.list(environment()), "expert", check = FALSE)
     }
@@ -271,45 +275,48 @@
 
 #' @title control.gcpo
 #' @inherit control.update params description seealso
+#' @inheritParams inla.group.cv
 #' @family control
 #' @export
 #' @details (For experts only!) Set control variables for the gcpo in [control.compute].
-#' The intended use is to use `inla.group.cv`.
-#' Refer to `?inla.group.cv` and the vignette for details.
+#' The intended use is to use [inla.group.cv()].
+#' Refer to [inla.group.cv()] and the vignette for details.
 control.gcpo <-
     function(
-             #' @param enable TODO
+             # @param enable TODO
              enable = FALSE,
-             #' @param num.level.sets TODO
+             # @param num.level.sets TODO
              num.level.sets = -1,
-             #' @param size.max TODO
+             # @param size.max TODO
              size.max = 32,
-             #' @param strategy TODO
+             # @param strategy TODO
              strategy = c("posterior", "prior"),
-             #' @param groups TODO
+             # @param groups TODO
              groups = NULL,
-             #' @param selection TODO
+             # @param selection TODO
              selection = NULL,
-             #' @param group.selection TODO
+             # @param group.selection TODO
              group.selection = NULL,
-             #' @param friends TODO
+             # @param friends TODO
              friends = NULL,
-             #' @param weights TODO
+             # @param weights TODO
              weights = NULL, 
-             #' @param verbose TODO
+             # @param verbose TODO
              verbose = FALSE,
-             #' @param epsilon TODO
+             # @param epsilon TODO
              epsilon = 0.005,
-             #' @param prior.diagonal TODO
+             # @param prior.diagonal TODO
              prior.diagonal = 1e-4,
-             #' @param correct.hyperpar TODO
+             # @param correct.hyperpar TODO
              correct.hyperpar = TRUE,
-             #' @param keep TODO
+             # @param keep TODO
              keep = NULL,
-             #' @param remove TODO
+             # @param remove TODO
              remove = NULL,
-             #' @param remove.fixed TODO
-             remove.fixed = TRUE
+             # @param remove.fixed TODO
+             remove.fixed = TRUE,
+             # @param type The type of cv, either "single" (default) or "joint"
+             type.cv = "single"
              ) {
         ctrl_object(as.list(environment()), "gcpo", check = FALSE)
     }
@@ -375,10 +382,6 @@ control.gcpo <-
              #' @param config A boolean variable if the internal GMRF approximations be
              #' stored. (Default `FALSE`.)
              config = FALSE,
-
-             #' @param likelihood.info A boolean variable to store likelihood-information or not.
-             #' This option requires `config=TRUE` (Default `FALSE`. EXPERIMENTAL)
-             likelihood.info = FALSE,
 
              #' @param smtp The sparse-matrix solver, one of 'default', 'taucs', 'band' or
              #' 'pardiso' (default `inla.getOption("smtp")`). `smtp='pardiso'` implies
@@ -455,8 +458,16 @@ control.gcpo <-
              #' @param verbose Show detailed output (default FALSE)
              verbose = FALSE,
 
-             #' @param tile.size The size of the tile (default 0 will chose automatically)
-             tile.size = 0
+             #' @param block.size (integer) Preferred number of rhs's in each parallel solve. Used to
+             #' split many rhs's into threads. Default value (-1) is to use the 'tile.size'
+             #' from sTiles, which is a reasonable tradeoff between speed and memory use.
+             #' A higher value will increase memory usage.
+             block.size = -1, 
+
+             #' @param param An integer vector of parameters (variable length).
+             #' Default values are given by '-1'.
+             #' See sTiles documentation for explaination of these parameters
+             param = rep(-1, 20) 
              ) {
         ctrl_object(as.list(environment()), "stiles", check = FALSE)
     }
@@ -468,8 +479,13 @@ control.gcpo <-
 #' @export
 `control.taucs` <-
     function(
-             #' @param block.size Preferred number of rhs's in each parallel solve
-             block.size = 40
+             #' @param block.size Minimum number of rhs's in each parallel solve. Used to split
+             #' rhs into threads (on the inner level)
+             min.block.size = 4, 
+
+             #' @param block.size Preferred number of rhs's in each parallel solve. Used to
+             #' split many rhs's into threads (on the outer level)
+             block.size = 64
              ) {
         ctrl_object(as.list(environment()), "taucs", check = FALSE)
     }
@@ -578,7 +594,10 @@ control.gcpo <-
              control.link = INLA::control.link(),
 
              #' @param control.sem Parameters for likelihood `sem`
-             control.sem = NULL
+             control.sem = NULL, 
+
+             #' @param cloglike An `inla.cloglike` object for likelihood `cloglike`
+             cloglike = NULL
              ) {
         ctrl_object(as.list(environment()), "family", check = FALSE)
     }
@@ -926,7 +945,7 @@ control.vb <-
 
              #' @param compute.initial.values Compute initial values for the latent field or not.
              #' (experimental-mode only)
-             compute.initial.values = FALSE,
+             compute.initial.values = TRUE,
 
              #' @param hessian.correct.skewness.only If TRUE (default) correct only
              #' skewness in the Hessian, for the hyperparameters. If FALSE,

@@ -53,7 +53,7 @@
              #' @param friends An optional list of lists of indices to use a friends
              friends = NULL, 
 
-             #' @param weights An optional positive weight attached to each datapoint. The sume
+             #' @param weights An optional positive weight attached to each datapoint. The sum
              #'  of the weights define the size of the group. If `NULL`, then unit weight is
              #'  used.
              weights = NULL, 
@@ -86,7 +86,10 @@
              #' which is in effect if both `keep` and `remove` are `NULL`. If
              #' `TRUE`, it will remove (or condition on) all fixed effects when
              #' computing the groups. See the vignette for details.
-             remove.fixed = TRUE)
+             remove.fixed = TRUE,
+
+             #' @param type.cv Type of cv, either "single" (default) or "joint"
+             type.cv = "single")
 {
     stopifnot(!missing(result))
     stopifnot(inherits(result, "inla"))
@@ -100,7 +103,22 @@
                    function(ii, cv.arg) cv.arg$groups[[ii]]$idx,
                    cv.arg=cv)
         }
-        return (inla.group.cv(result, groups = get.groups(group.cv), verbose = verbose))
+        return (inla.group.cv(result,
+                              groups = get.groups(group.cv),
+                              num.level.sets = num.level.sets,
+                              strategy = strategy,
+                              size.max = size.max,
+                              selection = selection,
+                              group.selection = group.selection,
+                              friends = friends,
+                              weights = weights,
+                              verbose = verbose,
+                              epsilon = epsilon,
+                              prior.diagonal = prior.diagonal,
+                              keep = keep,
+                              remove = remove,
+                              remove.fixed = remove.fixed, 
+                              type.cv = group.cv$type.cv))
     }
 
     cont.gcpo <- list(enable = TRUE,
@@ -118,7 +136,8 @@
                       correct.hyperpar = FALSE, 
                       keep = keep, 
                       remove = remove, 
-                      remove.fixed = remove.fixed)
+                      remove.fixed = remove.fixed,
+                      type.cv = type.cv)
 
     r <- result
     r$.args$control.compute$control.gcpo <- cont.gcpo
@@ -152,8 +171,9 @@
     group.cv <- do.call("inla", args = r$.args)$gcpo
     group.cv$cv <- group.cv$gcpo
     group.cv$gcpo <- NULL
-    r <- NULL
 
+    r <- NULL
     class(group.cv) <- "inla.group.cv"
+
     return (group.cv)
 }

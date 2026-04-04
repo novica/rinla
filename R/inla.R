@@ -1,8 +1,8 @@
-#' Bayesian analysis of structured additive models
+#' @title inla
 #' 
+#' @description
 #' `inla` performs a full Bayesian analysis of additive models using
 #' Integrated Nested Laplace approximation
-#' 
 #' 
 #' @param formula A `inla` formula like `y ~1 + z + f(ind,
 #' model="iid")` + f(ind2, weights, model="ar1") This is much like the formula
@@ -611,7 +611,7 @@
             family = cph$family,
             contrasts = contrasts,
             quantiles = quantiles,
-            E = E..coxph, 
+            E = cph.data$E..coxph, 
             offset = offset..coxph, 
             scale = scale..coxph,
             weights = weights..coxph, 
@@ -1109,7 +1109,6 @@
         quantiles = quantiles, smtp = cont.compute$smtp, q = cont.compute$q,
         openmp.strategy = cont.compute$openmp.strategy, graph = cont.compute$graph,
         config = cont.compute$config,
-        likelihood.info = cont.compute$likelihood.info,
         internal.opt = cont.compute$internal.opt, 
         save.memory = cont.compute$save.memory
     )
@@ -1810,6 +1809,20 @@
                 ## just make sure this is all set
                 if (is.null(gp$random.spec[[r]]$values)) {
                     gp$random.spec[[r]]$values <- location[[r]]
+
+                    warn <- inla.model.properties(gp$random.spec[[r]]$model,
+                                                  "latent")$missing.values.warning
+                    if (!is.null(warn) && warn) {
+                        v <- location[[r]]
+                        if (!all(diff(v) == diff(v)[1]) &&
+                            !inla.getOption('disable.values.warning')) {
+                            warning(paste0("*** Model[",  gp$random.spec[[r]]$model,
+                                           "] has irregular locations but argument 'values' is not set.\n",
+                                           "  *** This is often an error: read more in the vignette 'a-note-about-values'\n",
+                                           "  *** You can disable this warning with 'inla.setOption(disable.values.warning=TRUE)'"), 
+                                    immediate. = TRUE)
+                        }
+                    }
                 }
 
                 ## create a location and covariate file
@@ -2839,11 +2852,26 @@ formals(inla.core) <- formals(inla.core.safe) <- formals(inla)
     }
 }
 
-`inla.run.many` <- function(n.models = 1,
+#' @title inla.run.many
+#' @export
+#' @details A special `inla()`-function to run many models (of a particular type)
+#' used by package `INLAjoint` (for details,  check the `INLAjoint` implementation)
+`inla.run.many` <- function(
+                            #' @param n.models Number of models to run
+                            n.models = 1,
+                            
+                            #' @param working.directory Where to store results
                             working.directory = NULL,
+
+                            #' @param verbose Run in verbose mode or not
                             verbose = inla.getOption("verbose"),
+
+                            #' @param num.threads Number of threads to be used
                             num.threads = inla.getOption("num.threads"),
-                            cleanup = FALSE)
+
+                            #' @param cleanup Cleanup result files or leave them behind?
+                            cleanup = FALSE
+                            )
 {
     inla.call <- inla.getOption('inla.call')
     stopifnot(inla.call != "remote")

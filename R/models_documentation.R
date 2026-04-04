@@ -337,6 +337,53 @@
 #'           }
 #'          }
 #'        }
+#'       \item{Model 'prw2'.}{
+#'          \describe{
+#'           \item{Properties:}{
+#'             \describe{
+#'               \item{doc = }{\verb{Proper random walk of order 2}}
+#'               \item{constr = }{\verb{FALSE}}
+#'               \item{nrow.ncol = }{\verb{FALSE}}
+#'               \item{augmented = }{\verb{FALSE}}
+#'               \item{aug.factor = }{\verb{1}}
+#'               \item{aug.constr = }{\verb{NULL}}
+#'               \item{n.div.by = }{\verb{NULL}}
+#'               \item{n.required = }{\verb{FALSE}}
+#'               \item{set.default.values = }{\verb{FALSE}}
+#'               \item{pdf = }{\verb{prw2}}
+#'              }
+#'            }
+#'          }
+#'         Number of hyperparmeters is 2.
+#'          \describe{
+#'           \item{Hyperparameter 'theta1'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{6103}}
+#'             \item{name = }{\verb{log precision}}
+#'             \item{short.name = }{\verb{prec}}
+#'             \item{prior = }{\verb{pc.prec}}
+#'             \item{param = }{\verb{1 0.01}}
+#'             \item{initial = }{\verb{4}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{to.theta = }{\verb{function(x) log(x)}}
+#'             \item{from.theta = }{\verb{function(x) exp(x)}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta2'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{6102}}
+#'             \item{name = }{\verb{log range}}
+#'             \item{short.name = }{\verb{range}}
+#'             \item{prior = }{\verb{pc.prw2.range}}
+#'             \item{param = }{\verb{0 0 0 0}}
+#'             \item{initial = }{\verb{3}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{to.theta = }{\verb{function(x) log(x)}}
+#'             \item{from.theta = }{\verb{function(x) exp(x)}}
+#'             }
+#'           }
+#'          }
+#'        }
 #'       \item{Model 'seasonal'.}{
 #'          \describe{
 #'           \item{Properties:}{
@@ -350,6 +397,7 @@
 #'               \item{n.div.by = }{\verb{NULL}}
 #'               \item{n.required = }{\verb{FALSE}}
 #'               \item{set.default.values = }{\verb{FALSE}}
+#'               \item{missing.values.warning = }{\verb{TRUE}}
 #'               \item{pdf = }{\verb{seasonal}}
 #'              }
 #'            }
@@ -751,6 +799,7 @@
 #'               \item{n.div.by = }{\verb{NULL}}
 #'               \item{n.required = }{\verb{FALSE}}
 #'               \item{set.default.values = }{\verb{FALSE}}
+#'               \item{missing.values.warning = }{\verb{TRUE}}
 #'               \item{pdf = }{\verb{ar1}}
 #'              }
 #'            }
@@ -858,6 +907,7 @@
 #'               \item{n.div.by = }{\verb{NULL}}
 #'               \item{n.required = }{\verb{FALSE}}
 #'               \item{set.default.values = }{\verb{FALSE}}
+#'               \item{missing.values.warning = }{\verb{TRUE}}
 #'               \item{pdf = }{\verb{ar}}
 #'              }
 #'            }
@@ -11355,7 +11405,6 @@
 #'               \item{survival = }{\verb{FALSE}}
 #'               \item{discrete = }{\verb{TRUE}}
 #'               \item{link = }{\verb{default identity}}
-#'               \item{status = }{\verb{experimental}}
 #'               \item{pdf = }{\verb{fl}}
 #'              }
 #'            }
@@ -11857,6 +11906,340 @@
 #'           }
 #'          }
 #'        }
+#'       \item{Model '1poisson'.}{
+#'          \describe{
+#'           \item{Properties:}{
+#'             \describe{
+#'               \item{doc = }{\verb{New 1-inflated Poisson}}
+#'               \item{survival = }{\verb{FALSE}}
+#'               \item{discrete = }{\verb{TRUE}}
+#'               \item{link = }{\verb{default log quantile}}
+#'               \item{link.simple = }{\verb{default logit cauchit probit cloglog ccloglog}}
+#'               \item{pdf = }{\verb{0inflated}}
+#'              }
+#'            }
+#'          }
+#'         Number of hyperparmeters is 10.
+#'          \describe{
+#'           \item{Hyperparameter 'theta1'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56401}}
+#'             \item{name = }{\verb{beta1}}
+#'             \item{short.name = }{\verb{beta1}}
+#'             \item{output.name = }{\verb{beta1 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta1 for 1poisson observations}}
+#'             \item{initial = }{\verb{-4}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{-4 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta2'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56402}}
+#'             \item{name = }{\verb{beta2}}
+#'             \item{short.name = }{\verb{beta2}}
+#'             \item{output.name = }{\verb{beta2 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta2 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta3'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56403}}
+#'             \item{name = }{\verb{beta3}}
+#'             \item{short.name = }{\verb{beta3}}
+#'             \item{output.name = }{\verb{beta3 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta3 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta4'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56404}}
+#'             \item{name = }{\verb{beta4}}
+#'             \item{short.name = }{\verb{beta4}}
+#'             \item{output.name = }{\verb{beta4 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta4 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta5'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56405}}
+#'             \item{name = }{\verb{beta5}}
+#'             \item{short.name = }{\verb{beta5}}
+#'             \item{output.name = }{\verb{beta5 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta5 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta6'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56406}}
+#'             \item{name = }{\verb{beta6}}
+#'             \item{short.name = }{\verb{beta6}}
+#'             \item{output.name = }{\verb{beta6 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta6 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta7'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56407}}
+#'             \item{name = }{\verb{beta7}}
+#'             \item{short.name = }{\verb{beta7}}
+#'             \item{output.name = }{\verb{beta7 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta7 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta8'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56408}}
+#'             \item{name = }{\verb{beta8}}
+#'             \item{short.name = }{\verb{beta8}}
+#'             \item{output.name = }{\verb{beta8 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta8 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta9'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56409}}
+#'             \item{name = }{\verb{beta9}}
+#'             \item{short.name = }{\verb{beta9}}
+#'             \item{output.name = }{\verb{beta9 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta9 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta10'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56410}}
+#'             \item{name = }{\verb{beta10}}
+#'             \item{short.name = }{\verb{beta10}}
+#'             \item{output.name = }{\verb{beta10 for 1poisson observations}}
+#'             \item{output.name.intern = }{\verb{beta10 for 1poisson observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'          }
+#'        }
+#'       \item{Model '1poissonS'.}{
+#'          \describe{
+#'           \item{Properties:}{
+#'             \describe{
+#'               \item{doc = }{\verb{New 1-inflated Poisson Swap}}
+#'               \item{survival = }{\verb{FALSE}}
+#'               \item{discrete = }{\verb{TRUE}}
+#'               \item{link = }{\verb{default logit loga cauchit probit cloglog ccloglog loglog log sslogit logitoffset quantile pquantile robit sn powerlogit}}
+#'               \item{link.simple = }{\verb{default log}}
+#'               \item{pdf = }{\verb{0inflated}}
+#'              }
+#'            }
+#'          }
+#'         Number of hyperparmeters is 10.
+#'          \describe{
+#'           \item{Hyperparameter 'theta1'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56501}}
+#'             \item{name = }{\verb{beta1}}
+#'             \item{short.name = }{\verb{beta1}}
+#'             \item{output.name = }{\verb{beta1 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta1 for 1poissonS observations}}
+#'             \item{initial = }{\verb{-4}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{-4 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta2'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56502}}
+#'             \item{name = }{\verb{beta2}}
+#'             \item{short.name = }{\verb{beta2}}
+#'             \item{output.name = }{\verb{beta2 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta2 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta3'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56503}}
+#'             \item{name = }{\verb{beta3}}
+#'             \item{short.name = }{\verb{beta3}}
+#'             \item{output.name = }{\verb{beta3 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta3 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta4'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56504}}
+#'             \item{name = }{\verb{beta4}}
+#'             \item{short.name = }{\verb{beta4}}
+#'             \item{output.name = }{\verb{beta4 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta4 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta5'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56505}}
+#'             \item{name = }{\verb{beta5}}
+#'             \item{short.name = }{\verb{beta5}}
+#'             \item{output.name = }{\verb{beta5 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta5 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta6'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56506}}
+#'             \item{name = }{\verb{beta6}}
+#'             \item{short.name = }{\verb{beta6}}
+#'             \item{output.name = }{\verb{beta6 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta6 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta7'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56507}}
+#'             \item{name = }{\verb{beta7}}
+#'             \item{short.name = }{\verb{beta7}}
+#'             \item{output.name = }{\verb{beta7 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta7 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta8'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56508}}
+#'             \item{name = }{\verb{beta8}}
+#'             \item{short.name = }{\verb{beta8}}
+#'             \item{output.name = }{\verb{beta8 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta8 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta9'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56509}}
+#'             \item{name = }{\verb{beta9}}
+#'             \item{short.name = }{\verb{beta9}}
+#'             \item{output.name = }{\verb{beta9 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta9 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'           \item{Hyperparameter 'theta10'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{56510}}
+#'             \item{name = }{\verb{beta10}}
+#'             \item{short.name = }{\verb{beta10}}
+#'             \item{output.name = }{\verb{beta10 for 1poissonS observations}}
+#'             \item{output.name.intern = }{\verb{beta10 for 1poissonS observations}}
+#'             \item{initial = }{\verb{0}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{normal}}
+#'             \item{param = }{\verb{0 10}}
+#'             \item{to.theta = }{\verb{function(x) x}}
+#'             \item{from.theta = }{\verb{function(x) x}}
+#'             }
+#'           }
+#'          }
+#'        }
 #'       \item{Model 'bell'.}{
 #'          \describe{
 #'           \item{Properties:}{
@@ -12210,7 +12593,6 @@
 #'           \item{Properties:}{
 #'             \describe{
 #'               \item{doc = }{\verb{Binomial mixture}}
-#'               \item{status = }{\verb{experimental}}
 #'               \item{survival = }{\verb{FALSE}}
 #'               \item{discrete = }{\verb{TRUE}}
 #'               \item{link = }{\verb{default logit probit}}
@@ -13606,6 +13988,38 @@
 #'           }
 #'          }
 #'        }
+#'       \item{Model 'gammasv'.}{
+#'          \describe{
+#'           \item{Properties:}{
+#'             \describe{
+#'               \item{doc = }{\verb{The Gamma likelihood with constant rate}}
+#'               \item{status = }{\verb{experimental}}
+#'               \item{survival = }{\verb{FALSE}}
+#'               \item{discrete = }{\verb{FALSE}}
+#'               \item{link = }{\verb{default log}}
+#'               \item{pdf = }{\verb{gammasv}}
+#'              }
+#'            }
+#'          }
+#'         Number of hyperparmeters is 1.
+#'          \describe{
+#'           \item{Hyperparameter 'theta'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{58003}}
+#'             \item{name = }{\verb{precision parameter}}
+#'             \item{short.name = }{\verb{prec}}
+#'             \item{output.name = }{\verb{Precision-parameter for the Gammasv observations}}
+#'             \item{output.name.intern = }{\verb{Intern precision-parameter for the Gammasv observations}}
+#'             \item{initial = }{\verb{4.60517018598809}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{loggamma}}
+#'             \item{param = }{\verb{1 0.01}}
+#'             \item{to.theta = }{\verb{function(x) log(x)}}
+#'             \item{from.theta = }{\verb{function(x) exp(x)}}
+#'             }
+#'           }
+#'          }
+#'        }
 #'       \item{Model 'gammasurv'.}{
 #'          \describe{
 #'           \item{Properties:}{
@@ -14458,7 +14872,6 @@
 #'           \item{Properties:}{
 #'             \describe{
 #'               \item{doc = }{\verb{The ordered Beta likelihood}}
-#'               \item{status = }{\verb{experimental}}
 #'               \item{survival = }{\verb{FALSE}}
 #'               \item{discrete = }{\verb{FALSE}}
 #'               \item{link = }{\verb{default logit loga cauchit probit cloglog ccloglog loglog}}
@@ -15236,7 +15649,6 @@
 #'           \item{Properties:}{
 #'             \describe{
 #'               \item{doc = }{\verb{The exponential power likelihoood}}
-#'               \item{status = }{\verb{experimental}}
 #'               \item{survival = }{\verb{FALSE}}
 #'               \item{discrete = }{\verb{FALSE}}
 #'               \item{link = }{\verb{default identity quantile}}
@@ -15464,7 +15876,6 @@
 #'           \item{Properties:}{
 #'             \describe{
 #'               \item{doc = }{\verb{Thinned Poisson}}
-#'               \item{status = }{\verb{experimental}}
 #'               \item{survival = }{\verb{FALSE}}
 #'               \item{discrete = }{\verb{TRUE}}
 #'               \item{link = }{\verb{default log}}
@@ -15699,7 +16110,6 @@
 #'               \item{discrete = }{\verb{FALSE}}
 #'               \item{link = }{\verb{default identity}}
 #'               \item{pdf = }{\verb{iidgamma}}
-#'               \item{status = }{\verb{experimental}}
 #'              }
 #'            }
 #'          }
@@ -15746,7 +16156,6 @@
 #'               \item{discrete = }{\verb{FALSE}}
 #'               \item{link = }{\verb{default logit loga}}
 #'               \item{pdf = }{\verb{iidlogitbeta}}
-#'               \item{status = }{\verb{experimental}}
 #'              }
 #'            }
 #'          }
@@ -15793,7 +16202,6 @@
 #'               \item{discrete = }{\verb{FALSE}}
 #'               \item{link = }{\verb{default identity}}
 #'               \item{pdf = }{\verb{loggammafrailty}}
-#'               \item{status = }{\verb{experimental}}
 #'              }
 #'            }
 #'          }
@@ -18693,7 +19101,6 @@
 #'           \item{Properties:}{
 #'             \describe{
 #'               \item{doc = }{\verb{Exteneded Generalized Pareto likelihood}}
-#'               \item{status = }{\verb{experimental}}
 #'               \item{survival = }{\verb{FALSE}}
 #'               \item{discrete = }{\verb{FALSE}}
 #'               \item{link = }{\verb{default quantile}}
@@ -19168,9 +19575,10 @@
 #'             \describe{
 #'               \item{doc = }{\verb{von Mises circular distribution}}
 #'               \item{experimental = }{\verb{TRUE}}
+#'               \item{status = }{\verb{disabled}}
 #'               \item{survival = }{\verb{FALSE}}
 #'               \item{discrete = }{\verb{FALSE}}
-#'               \item{link = }{\verb{default circular tan tan.pi identity}}
+#'               \item{link = }{\verb{default circular tan identity}}
 #'               \item{pdf = }{\verb{vm}}
 #'              }
 #'            }
@@ -19193,6 +19601,86 @@
 #'             }
 #'           }
 #'          }
+#'        }
+#'       \item{Model 'nvm'.}{
+#'          \describe{
+#'           \item{Properties:}{
+#'             \describe{
+#'               \item{doc = }{\verb{Normal approx of the von Mises circular distribution}}
+#'               \item{experimental = }{\verb{TRUE}}
+#'               \item{status = }{\verb{disabled}}
+#'               \item{survival = }{\verb{FALSE}}
+#'               \item{discrete = }{\verb{FALSE}}
+#'               \item{link = }{\verb{default circular tan identity}}
+#'               \item{pdf = }{\verb{vm}}
+#'              }
+#'            }
+#'          }
+#'         Number of hyperparmeters is 1.
+#'          \describe{
+#'           \item{Hyperparameter 'theta'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{109201}}
+#'             \item{name = }{\verb{precision}}
+#'             \item{short.name = }{\verb{prec}}
+#'             \item{output.name.intern = }{\verb{prec_intern for nvm}}
+#'             \item{output.name = }{\verb{precision parameter for nvm}}
+#'             \item{initial = }{\verb{2}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{loggamma}}
+#'             \item{param = }{\verb{1 0.01}}
+#'             \item{to.theta = }{\verb{function(x) log(x)}}
+#'             \item{from.theta = }{\verb{function(x) exp(x)}}
+#'             }
+#'           }
+#'          }
+#'        }
+#'       \item{Model 'lavm'.}{
+#'          \describe{
+#'           \item{Properties:}{
+#'             \describe{
+#'               \item{doc = }{\verb{Link adjusted von Mises circular distribution}}
+#'               \item{experimental = }{\verb{TRUE}}
+#'               \item{survival = }{\verb{FALSE}}
+#'               \item{discrete = }{\verb{FALSE}}
+#'               \item{link = }{\verb{default circular tan identity}}
+#'               \item{pdf = }{\verb{lavm}}
+#'              }
+#'            }
+#'          }
+#'         Number of hyperparmeters is 1.
+#'          \describe{
+#'           \item{Hyperparameter 'theta'}{
+#'              \describe{
+#'             \item{hyperid = }{\verb{109301}}
+#'             \item{name = }{\verb{precision}}
+#'             \item{short.name = }{\verb{prec}}
+#'             \item{output.name.intern = }{\verb{prec_intern for lavm}}
+#'             \item{output.name = }{\verb{precision parameter for lavm}}
+#'             \item{initial = }{\verb{2}}
+#'             \item{fixed = }{\verb{FALSE}}
+#'             \item{prior = }{\verb{loggamma}}
+#'             \item{param = }{\verb{1 0.01}}
+#'             \item{to.theta = }{\verb{function(x) log(x)}}
+#'             \item{from.theta = }{\verb{function(x) exp(x)}}
+#'             }
+#'           }
+#'          }
+#'        }
+#'       \item{Model 'cloglike'.}{
+#'          \describe{
+#'           \item{Properties:}{
+#'             \describe{
+#'               \item{doc = }{\verb{User-defined likelihood}}
+#'               \item{experimental = }{\verb{TRUE}}
+#'               \item{survival = }{\verb{FALSE}}
+#'               \item{discrete = }{\verb{FALSE}}
+#'               \item{link = }{\verb{default identity}}
+#'               \item{pdf = }{\verb{cloglike}}
+#'              }
+#'            }
+#'          }
+#'         Number of hyperparmeters is 0.
 #'        }
 #'      }
 #' @section 'prior':
@@ -19231,6 +19719,9 @@
 #'        }
 #'       \item{Model 'gamma'.}{
 #'          Number of parameters in the prior = 2
+#'        }
+#'       \item{Model 'pc.prw2.range'.}{
+#'          Number of parameters in the prior = 4
 #'        }
 #'       \item{Model 'minuslogsqrtruncnormal'.}{
 #'          Number of parameters in the prior = 2

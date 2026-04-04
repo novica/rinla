@@ -1,3 +1,103 @@
+# INLA 26.05.19
+* Work on the forthcoming sTiles integration
+* Minor code revision and optimization
+
+# INLA 26.02.06
+* Code cleanup 
+* Revise installation scripts
+* Add PIT to gcpo calculations and output
+
+# INLA 26.01.26
+* Fixed in issue with feature 'lp.scale'
+* Minor modifications
+
+# INLA 26.01.23
+* Code optimization and code improvements
+* Computing initial values are now default enabled
+* Adding SIMDe code for critical parts
+* Linux: added clone_targets builds
+* Added support for aarch64 Linux
+
+# INLA 25.12.16
+* Code optimization
+* New version of family 'lavm'
+
+# INLA 25.12.12
+* Improve startup message
+* Added vignette about 'Alocal'
+* Code cleanup
+
+# INLA 25.12.02
+* Added warning for irregular locations used in models ar/ar1/seasonal
+* New likelihood 'lavm' (disabled other circular ones)
+* Updated documentation
+
+# INLA 25.11.22
+* Fix memory leak when factorisation fails
+* Code cleanup
+
+# INLA 25.11.20
+* Fixed an issue with user-defined integration points
+* Code cleanup
+
+# INLA 25.11.10
+* Redefinition of circular likelihood 'vm', added 'nvm'
+* Added new likelihoods '1poisson' and '1poissonS'
+* Some changes in dynamic library loading order for binaries
+* Some code optimisation
+
+# INLA 25.10.28
+* Added new external-package to be built `INLAtools`
+
+# INLA 25.10.19
+* Fixed an issue in `inla.cgeneric.q`
+
+# INLA 25.10.17
+* Fixed a regression in group cv with given groups
+* Added new likelihood 'gammasv' (experimental)
+
+# INLA 25.10.15
+* Fixed a regression with decreasing link-functions
+* Fixed and issue with 'inla.group.cv' and passing the argument
+  'type.cv' through
+* Added functions for the range prior in PRW2
+
+# INLA 25.10.13
+* Added (experimental) latent model PRW2
+* Code cleanup, improvement and optimisation
+
+# INLA 25.10.01
+* Fixed an regression for family="lognormal" (appeared on Mac M)
+* Code cleanup, improvement and optimisation
+
+# INLA 25.09.19
+* Code improvement and optimisation
+
+# INLA 25.09.04
+* Fixed a regression for 25.09.03
+* Made `opt.num.threads` default `TRUE`
+
+# INLA 25.09.03
+* Improved sTiles integration
+* Code optimisation and cleanup
+
+# INLA 25.08.29
+* More work on the sTiles integration
+* Improved some documentation
+* Code cleanup and improvement
+
+# INLA 25.08.21
+* Improved openmp code
+* Code cleanup and improvement
+* Improved data-storage
+* sTiles integration work
+* Fixed a regression in KLD calculations (in output summaries)
+* fmesher deprecation info update
+* Added argument `type.cv` for group-cv
+* Fixed a regression in family `coxph`
+* Added adaptive `num.threads` control at critical places (default `off`)
+* Added `cloglike`: user-likelihood code in `C` (experimental)
+
 # INLA 25.06.22
 * Improvement for 'gcpo' calculation
 * Code optimisation for some output calculations
