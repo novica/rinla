@@ -1,29 +1,23 @@
 #!/bin/bash
 
-if readlink -f / 2>/dev/null >/dev/null; then
-    myreadlink () {
-	readlink "$@"
-    }
-else
-    myreadlink () {
-	(
-	    shift 1
-	    tfile=$1
-	    cd $(dirname "$tfile")
-	    tfile=$(basename "$tfile")
-	    while [ -L "$tfile" ]
-	    do
-		tfile=$(myreadlink -f "$tfile")
-		cd $(dirname "$tfile")
-		tfile=$(basename "$tfile")
-	    done
-	    pdir=$(pwd -P)
-	    echo "$pdir/$tfile"
-	)
-    }
-fi
+myreadlink () {
+    (
+	TARGET_FILE=$1
+	cd `dirname $TARGET_FILE`
+	TARGET_FILE=`basename $TARGET_FILE`
+	while [ -L "$TARGET_FILE" ]
+	do
+	    TARGET_FILE=`readlink $TARGET_FILE`
+	    cd `dirname $TARGET_FILE`
+	    TARGET_FILE=`basename $TARGET_FILE`
+	done
+	PHYS_DIR=`pwd -P`
+	RESULT=$PHYS_DIR/$TARGET_FILE
+	echo $RESULT
+    )
+}
 
-cmd=$(myreadlink -f "$0")
+cmd=$(myreadlink "$0")
 DIR=$(dirname "$cmd")
 tmp=$(basename "$cmd")
 prog=${tmp%%.run}
@@ -38,11 +32,12 @@ else
     RHOME_LIB="$INLA_RHOME/lib"
 fi
 
-export DYLD_LIBRARY_PATH="$RHOME_LIB:$DIR:/usr/lib:/usr/local/lib:/opt/local/lib:$DYLD_LIBRARY_PATH"
+export DYLD_LIBRARY_PATH="$RHOME_LIB:$DIR:/usr/lib:/opt/local/lib:$DYLD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$DYLD_LIBRARY_PATH"
+
 if [ "${INLA_DEBUG}XX" != "XX" ]; then
     echo "DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH"
     otool -L "$DIR/$prog"
-    export DYLD_PRINT_LIBRARIES=YES
 fi
 
 exec "$DIR/$prog" "$@"

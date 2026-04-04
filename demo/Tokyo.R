@@ -17,10 +17,12 @@ summary(result)
 ## Plot the results
 plot(result)
 
-if (FALSE) {
-    ## only for classic mode
-    h = inla.hyperpar(result)
-    summary(h)
-    plot(h)
-}
+## Improve estimate of the hyperparameters
+h = inla.hyperpar(result)
+
+## Summarise improved estimates
+summary(h)
+
+## Plot improved estimates
+plot(h)
 

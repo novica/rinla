@@ -1,5 +1,18 @@
-#' @include spde.common.R
-NULL
+## 'spde3' model functions
+## External: inla.spde.precision!inla.spde3
+## External: inla.spde.result!inla.spde3 inla.spde3.generic
+## External: inla.spde3.matern param2.matern.orig
+## External: inla.spde3.matern.sd.basis inla.spde3.models
+## External: inla.spde3.precision inla.spde3.result
+## External: inla.spde3.theta2phi0 inla.spde3.theta2phi1
+## External: inla.spde3.theta2phi2 inla.spde3.theta2phi3
+##
+## Internal: inla.internal.spde3.matern.B.tau
+## Internal: inla.internal.test.spde3.sd.basis
+
+
+
+
 
 inla.spde3.generic <-
     function(M0, M1, M2, M3, B0, B1, B2, B3, theta.mu, theta.Q,
@@ -99,22 +112,30 @@ inla.spde3.generic <-
                    n=n.spde,
                    spde3.transform=transform,
                    hyper.default =
-                       (list(theta1 =
-                                 list(prior="mvnorm",
-                                      param=(c(param.inla$theta.mu,
-                                               as.matrix(param.inla$theta.Q)))
-                                      )
-                             ))
+                   (list(theta1 =
+                         list(prior="mvnorm",
+                              param=(c(param.inla$theta.mu,
+                                       as.matrix(param.inla$theta.Q)))
+                              )
+                         ))
                    ))
     if (n.theta>0)
         for (k in 1:n.theta) {
             eval(parse(text=
-                           paste("spde$f$hyper.default$theta", k,
-                                 "$initial = param.inla$theta.mu[k]", sep="")))
+                       paste("spde$f$hyper.default$theta", k,
+                             "$initial = param.inla$theta.mu[k]", sep="")))
         }
 
     return(spde)
 }
+
+
+
+
+
+
+
+
 
 inla.internal.spde3.matern.B.tau =
     function(precision.fcn, n.theta, delta = 1e-3, ...)
@@ -139,6 +160,8 @@ inla.internal.spde3.matern.B.tau =
     return(B.tau)
 }
 
+
+
 inla.spde3.matern.sd.basis =
     function(mesh, B.sd, B.range, method=1,
              local.offset.compensation=FALSE,
@@ -147,15 +170,15 @@ inla.spde3.matern.sd.basis =
     p.sd = ncol(B.sd)-1L
     p.kappa = ncol(B.range)-1L
 
-    d = fmesher::fm_manifold_dim(mesh)
+    d = inla.ifelse(inherits(mesh, "inla.mesh"), 2, 1)
     nu = alpha-d/2
     nu.nominal = max(0.5, nu)
     alpha.nominal = max(nu.nominal+d/2, alpha)
 
-    n.spde = fmesher::fm_dof(mesh)
+    n.spde = inla.ifelse(d==2, mesh$n, mesh$m)
 
     ## log(kappa) = 0.5*log(8*nu) - log(range)
-    B.kappa = (cbind(log(8*nu.nominal)/2 - B.range[,1],
+    B.kappa = (cBind(log(8*nu.nominal)/2 - B.range[,1],
                      -B.range[,-1,drop=FALSE] ))
 
     if (method==1) {
@@ -165,11 +188,11 @@ inla.spde3.matern.sd.basis =
         B.tau =
             inla.internal.spde3.matern.B.tau(
                 precision.fcn=
-                    function(theta, spde) {
-                return(inla.spde3.precision(spde, theta=theta))
-            },
-            n.theta = p.kappa,
-            spde = spde)
+                function(theta, spde) {
+                    return(inla.spde3.precision(spde, theta=theta))
+                },
+                n.theta = p.kappa,
+                spde = spde)
         if (!local.offset.compensation) {
             B.tau[,1] = rep(mean(B.tau[,1]), spde$n.spde)
         }
@@ -192,11 +215,11 @@ inla.spde3.matern.sd.basis =
     log.var.scaling = lgamma(nu.nominal)-lgamma(alpha.nominal)-log(4*pi)*d/2
 
     B.tau =
-        cbind(B.tau[,1]-B.sd[,1],
+        cBind(B.tau[,1]-B.sd[,1],
               -B.sd[,-1,drop=FALSE],
               B.tau[,-1,drop=FALSE])
     B.kappa =
-        cbind(B.kappa[,1],
+        cBind(B.kappa[,1],
               matrix(0, n.spde, p.sd),
               B.kappa[,-1,drop=FALSE])
 
@@ -204,17 +227,19 @@ inla.spde3.matern.sd.basis =
 
 }
 
-inla.internal.test.spde3.sd.basis = function (k=1, dth=0.1, r=1000, globe=25, compensate=FALSE)
-{
+
+
+inla.internal.test.spde3.sd.basis = function (k=1, dth=0.1, r=1000, globe=25, compensate=FALSE) {
+
     alpha=2
-    mesh = fmesher::fm_rcdt_2d_inla(globe=globe)
+    mesh = inla.mesh.create(globe=globe)
 
     B.common = inla.mesh.basis(mesh, "b.spline", n=3)
-    B.common = cbind(B.common, B.common[,1]*(mesh$loc[,3]>0))
+    B.common = cBind(B.common, B.common[,1]*(mesh$loc[,3]>0))
     B.common[,1] = B.common[,1]*(mesh$loc[,3]<=0)
 
-    B.sd = cbind(0, B.common)
-    B.range = cbind(log(r/6370), B.common)
+    B.sd = cBind(0, B.common)
+    B.range = cBind(log(r/6370), B.common)
 
     sd.basis0 = inla.spde3.matern.sd.basis(mesh, B.sd=B.sd, B.range=B.range, method=0, alpha=alpha, local.offset.compensation=compensate)
     sd.basis1 = inla.spde3.matern.sd.basis(mesh, B.sd=B.sd, B.range=B.range, method=1, alpha=alpha, local.offset.compensation=compensate)
@@ -278,6 +303,9 @@ inla.internal.test.spde3.sd.basis = function (k=1, dth=0.1, r=1000, globe=25, co
     return(environment())
 }
 
+
+
+
 param2.matern.orig =
     function(mesh,
              alpha=2,
@@ -293,20 +321,19 @@ param2.matern.orig =
     ## NOTE: For d==1, degree==2, the B.* must be given per basis
     ## function, not per knot.
 
-    ## No need to know what object class it is.
-    ##    inla.require.inherits(mesh, c("inla.mesh", "inla.mesh.1d"), "'mesh'")
+    inla.require.inherits(mesh, c("inla.mesh", "inla.mesh.1d"), "'mesh'")
     if (is.null(B.tau))
         stop("B.tau must not be NULL.")
     if (is.null(B.kappa))
         stop("B.kappa must not be NULL.")
     is.stationary = (nrow(B.kappa)==1) && (nrow(B.tau)==1)
 
-    d = fmesher::fm_manifold_dim(mesh)
+    d = inla.ifelse(inherits(mesh, "inla.mesh"), 2, 1)
     nu = alpha-d/2
     nu.nominal = max(0.5, nu)
     alpha.nominal = max(nu.nominal+d/2, alpha)
 
-    n.spde = fmesher::fm_dof(mesh)
+    n.spde = inla.ifelse(d==2, mesh$n, mesh$m)
     n.theta = ncol(B.kappa)-1L
 
     B.kappa = inla.spde.homogenise_B_matrix(B.kappa, n.spde, n.theta)
@@ -364,8 +391,14 @@ param2.matern.orig =
 
     if (is.null(theta.prior.mean)) {
         if (is.null(prior.range.nominal)) {
-            mesh.range <- fmesher::fm_diameter(mesh)
-            prior.range.nominal <- mesh.range*0.2
+            mesh.range =
+                inla.ifelse(d==2,
+                            (max(c(diff(range(mesh$loc[,1])),
+                                   diff(range(mesh$loc[,2])),
+                                   diff(range(mesh$loc[,3]))
+                                   ))),
+                            diff(mesh$interval))
+            prior.range.nominal = mesh.range*0.2
         }
 
         if (is.null(prior.kappa)) {
@@ -412,7 +445,7 @@ inla.spde3.matern =
              theta.prior.mean = NULL,
              theta.prior.prec = 0.1)
 {
-    # inla.require.inherits(mesh, c("inla.mesh", "inla.mesh.1d"), "'mesh'")
+    inla.require.inherits(mesh, c("inla.mesh", "inla.mesh.1d"), "'mesh'")
     fractional.method = match.arg(fractional.method)
 
     if (is.null(param)) {
@@ -446,27 +479,37 @@ inla.spde3.matern =
         }
     }
 
-    d = fmesher::fm_manifold_dim(mesh)
+    d = inla.ifelse(inherits(mesh, "inla.mesh"), 2, 1)
     nu = alpha-d/2
     nu.nominal = max(0.5, nu)
     alpha.nominal = max(nu.nominal+d/2, alpha)
 
-    n.spde = fmesher::fm_dof(mesh)
+    n.spde = inla.ifelse(d==2, mesh$n, mesh$m)
     n.theta = ncol(B.kappa)-1L
 
-    fem = fmesher::fm_fem(mesh, order = 2)
-    fem <- fmesher_fem_cc_compat(mesh, fem) # Not needed from fmesher 0.7.0.9001
+    if (d==2) {
+        fem =
+            inla.fmesher.smorg(mesh$loc,
+                               mesh$graph$tv,
+                               fem=2,
+                               output=list("c0", "c1", "g1", "g2"))
+    } else {
+        fem = inla.mesh.1d.fem(mesh)
+        if (mesh$degree==2) {
+            fem$c0 = fem$c1 ## Use higher order matrix.
+        }
+    }
 
     if (alpha==2) {
         B.phi0 = param$B.tau
         B.phi1 = 2*param$B.kappa
-        M0 = fem$cc
+        M0 = fem$c0
         M1 = fem$g1
         M2 = fem$g2
     } else if (alpha==1) {
         B.phi0 = param$B.tau
         B.phi1 = param$B.kappa
-        M0 = fem$cc
+        M0 = fem$c0
         M1 = fem$g1*0
         M2 = fem$g1
     } else if (!param$is.stationary) {
@@ -485,7 +528,7 @@ inla.spde3.matern =
         }
         B.phi0 = param$B.tau + (alpha-2)*param$B.kappa
         B.phi1 = 2*param$B.kappa
-        M0 = fem$cc*b[1]
+        M0 = fem$c0*b[1]
         M1 = fem$g1*b[2]/2
         M2 = fem$g2*b[3]
     } else if ((alpha<1) && (alpha>0)) {
@@ -502,7 +545,7 @@ inla.spde3.matern =
         }
         B.phi0 = param$B.tau + (alpha-1)*param$B.kappa
         B.phi1 = param$B.kappa
-        M0 = fem$cc*b[1]
+        M0 = fem$c0*b[1]
         M1 = fem$g1*0
         M2 = fem$g1*b[2]
     } else {
@@ -530,13 +573,13 @@ inla.spde3.matern =
         }
         if (!is.null(extraconstr.int)) {
             A.constr =
-                rbind(A.constr,
+                rBind(A.constr,
                       matrix(extraconstr.int$A %*% fem$c1,
                              nrow(extraconstr.int$A), n.spde))
             e.constr = c(e.constr, extraconstr.int$e)
         }
         if (!is.null(extraconstr)) {
-            A.constr = rbind(A.constr, extraconstr$A)
+            A.constr = rBind(A.constr, extraconstr$A)
             e.constr = c(e.constr, extraconstr$e)
         }
 
@@ -549,6 +592,13 @@ inla.spde3.matern =
 
     return(invisible(spde))
 }
+
+
+
+
+
+
+
 
 param3.iheat <- function(mesh.space,
                          mesh.time,
@@ -582,131 +632,147 @@ inla.spde3.iheat =
     ## (1 - gamma.E Laplacian)^(alpha.E/2) E = W/sqrt(gamma.s)
     ## gamma.E and alpha.E known
 
-        ## inla.require.inherits(mesh.space, c("inla.mesh", "inla.mesh.1d"),
-        ##                       "'mesh.space'")
-        ## inla.require.inherits(mesh.time, c("inla.mesh.1d"),
-        ##                   "'mesh.time'")
+    inla.require.inherits(mesh.space, c("inla.mesh", "inla.mesh.1d"),
+                          "'mesh.space'")
+    inla.require.inherits(mesh.time, c("inla.mesh.1d"),
+                          "'mesh.time'")
 
-    if (is.null(param)) {
-        stop("Use param3.iheat() to construct the prior parameter settings")
-        ##        param =
-        ##            param3.iheat(
-        ##                mesh.space, mesh.time,
-        ##                theta.prior.mean,
-        ##                theta.prior.prec)
-    }
+  if (is.null(param)) {
+    stop("Use param3.iheat() to construct the prior parameter settings")
+    ##        param =
+    ##            param3.iheat(
+    ##                mesh.space, mesh.time,
+    ##                theta.prior.mean,
+    ##                theta.prior.prec)
+  }
 
-    d.space = fmesher::fm_manifold_dim(mesh.space)
+    d.space = inla.ifelse(inherits(mesh.space, "inla.mesh.1d"), 1, 2)
     d.time = 1
-    n.space = fmesher::fm_dof(mesh.space)
-    n.time = fmesher::fm_dof(mesh.time)
+    n.space = inla.ifelse(d.space==2, mesh.space$n, mesh.space$m)
+    n.time = mesh.time$m
     n.spde = n.space*n.time
     n.theta = 2L ## gamma.s, gamma.t
 
-    fem.space = fmesher::fm_fem(mesh.space, order = 2)
-    fem.time = fmesher::fm_fem(mesh.time, order = 2)
-    # Not needed from fmesher 0.7.0.9001:
-    fem <- fmesher_fem_cc_compat(mesh.space, fem,space)
-    fem <- fmesher_fem_cc_compat(mesh.time, fem.time)
-
-    ## TODO: the rest
-    if (FALSE) {
-
-        if (alpha==2) {
-            B.phi0 = param$B.tau
-            B.phi1 = 2*param$B.kappa
-            M0 = fem$c0
-            M1 = fem$g1
-            M2 = fem$g2
-        } else if (alpha==1) {
-            B.phi0 = param$B.tau
-            B.phi1 = param$B.kappa
-            M0 = fem$c0
-            M1 = fem$g1*0
-            M2 = fem$g1
-        } else if (!param$is.stationary) {
-            stop("Non-stationary Matern with fractional alpha is not implemented.")
-        } else if ((alpha<2) && (alpha>1)) {
-            if (fractional.method == "parsimonious") {
-                lambda = alpha-floor(alpha)
-                b = matrix(c(1,0,0, 1,1,0, 1,2,1),3,3) %*%
-                    solve(matrix(1/(c(4:2, 3:1, 2:0)+lambda), 3, 3),
-                          1/(c(4:2)+lambda-alpha))
-            } else if (fractional.method == "null") {
-                b = c(1,alpha,alpha*(alpha-1)/2)
-            } else {
-                stop(paste("Unknown fractional.method '", fractional.method,
-                           "'.", sep=""))
-            }
-            B.phi0 = param$B.tau + (alpha-2)*param$B.kappa
-            B.phi1 = 2*param$B.kappa
-            M0 = fem$c0*b[1]
-            M1 = fem$g1*b[2]/2
-            M2 = fem$g2*b[3]
-        } else if ((alpha<1) && (alpha>0)) {
-            if (fractional.method == "parsimonious") {
-                lambda = alpha-floor(alpha)
-                b = matrix(c(1,0,1,1),2,2) %*%
-                    solve(matrix(1/(c(2:1, 1:0)+lambda), 2, 2),
-                          1/(c(2:1)+lambda-alpha))
-            } else if (fractional.method == "null") {
-                b = c(1,alpha)
-            } else {
-                stop(paste("Unknown fractional.method '", fractional.method,
-                           "'.", sep=""))
-            }
-            B.phi0 = param$B.tau + (alpha-1)*param$B.kappa
-            B.phi1 = param$B.kappa
-            M0 = fem$c0*b[1]
-            M1 = fem$g1*0
-            M2 = fem$g1*b[2]
-        } else {
-            stop(paste("Unsupported alpha value (", alpha,
-                       "). Supported values are 0 < alpha <= 2", sep=""))
+    if (d.space==2) {
+        fem.space = inla.mesh.fem(mesh.space$loc, 2)
+    } else {
+        fem.space = inla.mesh.1d.fem(mesh.space)
+        if (mesh.space$degree==2) {
+            fem.space$c0 = fem.space$c1 ## Use higher order matrix.
         }
-
-        spde =
-            inla.spde3.generic(M0=M0, M1=M1, M2=M2,
-                               B0=B.phi0, B1=B.phi1, B2=1,
-                               theta.mu = param$theta.prior.mean,
-                               theta.Q = param$theta.prior.prec,
-                               transform = "identity",
-                               BLC = param$BLC)
-        spde$model = "matern"
-        spde$BLC = param$BLC
-
-        if (constr || !is.null(extraconstr.int)) {
-            if (constr) {
-                A.constr = matrix(colSums(fem$c1), 1, n.spde)
-                e.constr = 0
-            } else {
-                A.constr = matrix(numeric(0), 0, n.spde)
-                e.constr = c()
-            }
-            if (!is.null(extraconstr.int)) {
-                A.constr =
-                    rbind(A.constr,
-                          matrix(extraconstr.int$A %*% fem$c1,
-                                 nrow(extraconstr.int$A), n.spde))
-                e.constr = c(e.constr, extraconstr.int$e)
-            }
-            if (!is.null(extraconstr)) {
-                A.constr = rbind(A.constr, extraconstr$A)
-                e.constr = c(e.constr, extraconstr$e)
-            }
-
-            spde$f$constr = FALSE
-            spde$f$extraconstr = list(A=A.constr, e=e.constr)
-        } else if (!is.null(extraconstr)) {
-            spde$f$constr = FALSE
-            spde$f$extraconstr = extraconstr
-        }
-
-        return(invisible(spde))
+    }
+    fem.time = inla.mesh.1d.fem(mesh.time)
+    if (mesh.time$degree==2) {
+        fem.time$c0 = fem.time$c1 ## Use higher order matrix.
     }
 
-    invisible(NULL)
+  ## TODO: the rest
+  if (FALSE) {
+
+    if (alpha==2) {
+        B.phi0 = param$B.tau
+        B.phi1 = 2*param$B.kappa
+        M0 = fem$c0
+        M1 = fem$g1
+        M2 = fem$g2
+    } else if (alpha==1) {
+        B.phi0 = param$B.tau
+        B.phi1 = param$B.kappa
+        M0 = fem$c0
+        M1 = fem$g1*0
+        M2 = fem$g1
+    } else if (!param$is.stationary) {
+        stop("Non-stationary Matern with fractional alpha is not implemented.")
+    } else if ((alpha<2) && (alpha>1)) {
+        if (fractional.method == "parsimonious") {
+            lambda = alpha-floor(alpha)
+            b = matrix(c(1,0,0, 1,1,0, 1,2,1),3,3) %*%
+                solve(matrix(1/(c(4:2, 3:1, 2:0)+lambda), 3, 3),
+                      1/(c(4:2)+lambda-alpha))
+        } else if (fractional.method == "null") {
+            b = c(1,alpha,alpha*(alpha-1)/2)
+        } else {
+            stop(paste("Unknown fractional.method '", fractional.method,
+                       "'.", sep=""))
+        }
+        B.phi0 = param$B.tau + (alpha-2)*param$B.kappa
+        B.phi1 = 2*param$B.kappa
+        M0 = fem$c0*b[1]
+        M1 = fem$g1*b[2]/2
+        M2 = fem$g2*b[3]
+    } else if ((alpha<1) && (alpha>0)) {
+        if (fractional.method == "parsimonious") {
+            lambda = alpha-floor(alpha)
+            b = matrix(c(1,0,1,1),2,2) %*%
+                solve(matrix(1/(c(2:1, 1:0)+lambda), 2, 2),
+                      1/(c(2:1)+lambda-alpha))
+        } else if (fractional.method == "null") {
+            b = c(1,alpha)
+        } else {
+            stop(paste("Unknown fractional.method '", fractional.method,
+                       "'.", sep=""))
+        }
+        B.phi0 = param$B.tau + (alpha-1)*param$B.kappa
+        B.phi1 = param$B.kappa
+        M0 = fem$c0*b[1]
+        M1 = fem$g1*0
+        M2 = fem$g1*b[2]
+    } else {
+        stop(paste("Unsupported alpha value (", alpha,
+                   "). Supported values are 0 < alpha <= 2", sep=""))
+    }
+
+    spde =
+        inla.spde3.generic(M0=M0, M1=M1, M2=M2,
+                           B0=B.phi0, B1=B.phi1, B2=1,
+                           theta.mu = param$theta.prior.mean,
+                           theta.Q = param$theta.prior.prec,
+                           transform = "identity",
+                           BLC = param$BLC)
+    spde$model = "matern"
+    spde$BLC = param$BLC
+
+    if (constr || !is.null(extraconstr.int)) {
+        if (constr) {
+            A.constr = matrix(colSums(fem$c1), 1, n.spde)
+            e.constr = 0
+        } else {
+            A.constr = matrix(numeric(0), 0, n.spde)
+            e.constr = c()
+        }
+        if (!is.null(extraconstr.int)) {
+            A.constr =
+                rBind(A.constr,
+                      matrix(extraconstr.int$A %*% fem$c1,
+                             nrow(extraconstr.int$A), n.spde))
+            e.constr = c(e.constr, extraconstr.int$e)
+        }
+        if (!is.null(extraconstr)) {
+            A.constr = rBind(A.constr, extraconstr$A)
+            e.constr = c(e.constr, extraconstr$e)
+        }
+
+        spde$f$constr = FALSE
+        spde$f$extraconstr = list(A=A.constr, e=e.constr)
+    } else if (!is.null(extraconstr)) {
+        spde$f$constr = FALSE
+        spde$f$extraconstr = extraconstr
+    }
+
+    return(invisible(spde))
+  }
+
+  invisible(NULL)
 }
+
+
+
+
+
+
+
+
+
 
 inla.spde3.theta2phi0 = function(spde, theta)
 {
@@ -769,7 +835,6 @@ inla.spde3.theta2phi3 = function(spde, theta)
         return(exp(spde$param.inla$B3[,1, drop=TRUE]))
 }
 
-#' @noRd
 inla.spde3.precision =
     function(spde, theta=NULL,
              phi0=inla.spde3.theta2phi0(spde, theta),
@@ -792,12 +857,13 @@ inla.spde3.precision =
                   t(spde$param.inla$M1) %*% D12 +
                   spde$param.inla$M2 +
                   t(spde$param.inla$M3) %*% D3 %*% spde$param.inla$M3)
-        %*% D0)
+          %*% D0)
 
     return(Q)
 }
 
-#' @noRd
+
+
 inla.spde3.result = function(inla, name, spde, do.transform=TRUE, ...)
 {
     inla.require.inherits(inla, "inla", "'inla'")
@@ -890,6 +956,100 @@ inla.spde3.result = function(inla, name, spde, do.transform=TRUE, ...)
     return(result)
 }
 
+inla.spde3.result = function(inla, name, spde, do.transform=TRUE, ...)
+{
+    inla.require.inherits(inla, "inla", "'inla'")
+    inla.require.inherits(spde, "inla.spde3", "'spde'")
+    if (!spde$f$model=="spde3") {
+        stop("'inla.spde3.result' only supports internal inla models 'spde3'")
+    }
+
+    result = list()
+    ## Setup rownames
+    BLC.names = rownames(spde$param.inla$BLC)
+
+    ## Values
+    result$summary.values = inla$summary.random[[name]]
+
+    ## Marginals for values
+    if (!is.null(inla$marginals.random[[name]])) {
+        result$marginals.values = inla$marginals.random[[name]]
+    }
+
+    ## Theta
+    result$summary.hyperpar =
+        inla.extract.el(inla$summary.hyperpar,
+                        paste("Theta[^ ]+ for ", name, "$", sep=""))
+
+    ## Marginals for theta
+    if (!is.null(inla$marginals$hyperpar)) {
+        result$marginals.hyperpar =
+            inla.extract.el(inla$marginals.hyperpar,
+                            paste("Theta[^ ]+ for ", name, "$", sep=""))
+    }
+
+    ## log-tau/kappa/variance/range
+    if (!is.null(inla$summary.spde3.blc[[name]])) {
+        rownames(inla$summary.spde3.blc[[name]]) <- BLC.names
+
+        result$summary.theta =
+            inla.extract.el(inla$summary.spde3.blc[[name]],
+                            "theta\\.[^ ]+$")
+        result$summary.log.tau =
+            inla.extract.el(inla$summary.spde3.blc[[name]],
+                            "tau\\.[^ ]+$")
+        result$summary.log.kappa =
+            inla.extract.el(inla$summary.spde3.blc[[name]],
+                            "kappa\\.[^ ]+$")
+        result$summary.log.variance.nominal =
+            inla.extract.el(inla$summary.spde3.blc[[name]],
+                            "variance.nominal\\.[^ ]+$")
+        result$summary.log.range.nominal =
+            inla.extract.el(inla$summary.spde3.blc[[name]],
+                            "range.nominal\\.[^ ]+$")
+    }
+
+    ## Marginals for log-tau/kappa/variance/range
+    if (!is.null(inla$marginals.spde3.blc[[name]])) {
+        names(inla$marginals.spde3.blc[[name]]) <- BLC.names
+
+        result$marginals.theta =
+            inla.extract.el(inla$marginals.spde3.blc[[name]],
+                            "theta\\.[^ ]+$")
+        result$marginals.log.tau =
+            inla.extract.el(inla$marginals.spde3.blc[[name]],
+                            "tau\\.[^ ]+$")
+        result$marginals.log.kappa =
+            inla.extract.el(inla$marginals.spde3.blc[[name]],
+                            "kappa\\.[^ ]+$")
+        result$marginals.log.variance.nominal =
+            inla.extract.el(inla$marginals.spde3.blc[[name]],
+                            "variance.nominal\\.[^ ]+$")
+        result$marginals.log.range.nominal =
+            inla.extract.el(inla$marginals.spde3.blc[[name]],
+                            "range.nominal\\.[^ ]+$")
+
+        if (do.transform) {
+            result$marginals.tau =
+                lapply(result$marginals.log.tau,
+                       function(x) inla.tmarginal(function(y) exp(y), x))
+            result$marginals.kappa =
+                lapply(result$marginals.log.kappa,
+                       function(x) inla.tmarginal(function(y) exp(y), x))
+            result$marginals.variance.nominal =
+                lapply(result$marginals.log.variance.nominal,
+                       function(x) inla.tmarginal(function(y) exp(y), x))
+            result$marginals.range.nominal =
+                lapply(result$marginals.log.range.nominal,
+                       function(x) inla.tmarginal(function(y) exp(y), x))
+        }
+    }
+
+    return(result)
+}
+
+
+
 inla.spde3.models = function()
 {
     return(c("generic", "matern"))
@@ -897,9 +1057,5 @@ inla.spde3.models = function()
 
 
 ## spde.common-connections:
-#' @exportS3Method inla.spde.precision inla.spde3
-#' @noRd
 inla.spde.precision.inla.spde3 = inla.spde3.precision
-#' @exportS3Method inla.spde.result inla.spde3
-#' @noRd
 inla.spde.result.inla.spde3 = inla.spde3.result

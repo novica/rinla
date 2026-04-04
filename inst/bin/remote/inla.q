@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
+CYGWIN=0
+
 ## This is the inla.q-script for handling the remote inla-queue.  This
-## version works for Linux/Mac.
+## version works both for Linux/Mac and Windows under CYGWIN. We just
+## have to add the environment
 
 maketemp () {
     mktemp -t inla.q.XXXXXXXX
@@ -22,13 +25,22 @@ if [ "${INLA_DEBUG}XX" != "XX" ]; then
     echo "INLA_HOME $INLA_HOME"
     echo "INLA_SSH_AUTH_SOCK $INLA_SSH_AUTH_SOCK"
     echo "INLA_OS $INLA_OS"
+    echo "INLA_CYGWIN_HOME $INLA_CYGWIN_HOME"
     echo "INLA_HGVERSION $INLA_HGVERSION"
 fi
 
-INIFILE=~/.inlarc
-if [ "$SSH_AUTH_SOCK"XX == "XX" ]; then
-    ## this is not set, weird, but it might be that a manual setup is used
+if [ "$INLA_OS" == "windows" ]; then
+    INIFILE=$INLA_HOME/.inlarc
     export SSH_AUTH_SOCK="$INLA_SSH_AUTH_SOCK"
+    if [ "$INLA_CYGWIN_HOME"XX != "XX" ]; then
+	export HOME=$INLA_CYGWIN_HOME
+    fi
+else
+    INIFILE=~/.inlarc
+    if [ "$SSH_AUTH_SOCK"XX == "XX" ]; then
+	## this is not set, weird, but it might be that a manual setup is used
+	export SSH_AUTH_SOCK="$INLA_SSH_AUTH_SOCK"
+    fi   
 fi
 
 ## these are the variables to be set by the user
@@ -39,7 +51,14 @@ Port=$SSHDefaultPort
 sshArguments="-x -o BatchMode=yes -o TCPKeepAlive=yes -e none"
 
 if [ -r "$INIFILE" ]; then
-    source "$INIFILE"
+    if [ "$INLA_OS" == "windows" ]; then
+	TMP=$(maketemp)
+	tr -d \\015 < "$INIFILE" > $TMP
+	source $TMP
+	rm -rf $TMP
+    else
+	source "$INIFILE"
+    fi
 else
     echo -e "\n\n\n$0: No such file $INIFILE"
     echo -e "Run command in R: inla.remote()"
@@ -99,7 +118,7 @@ elif [ "$cmd" = "get" ]; then
 	                 cd \$d; \
 			 if [ -f done ]; then \
 			     if \[ -f $Logfile \]; then cp $Logfile results.files; fi; \
-			     tar cf ../$tarfile results.files 2>/dev/null ; \
+			     tar cf ../$tarfile results.files; \
 			     if [ $remove -eq 1 ]; then \
                                  cd ..; rm -rf \$d; \
                              fi; \
@@ -110,7 +129,7 @@ elif [ "$cmd" = "get" ]; then
     scp -P$Port -B -C -p -q $RemoteUser@$RemoteHost:$rdir/$tarfile "$tarfile_to" >/dev/null 2>&1 || \
         {  echo "ERROR Job is not yet finished or does not exist; try 'inla.qstat()'"; exit; }
     ssh -p$Port $sshArguments $RemoteUser@$RemoteHost "rm -f $rdir/$tarfile" 
-    tar xfm  "$tarfile_to" -C $dirto 2>/dev/null 
+    tar xfm  "$tarfile_to" -C $dirto
     rm -f "$tarfile_to"
     rm -f "${tarfile_to%.tar}"
     echo "$dirto"
