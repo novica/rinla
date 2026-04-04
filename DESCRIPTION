@@ -66,6 +66,7 @@ Suggests:
     rgl,
     rmarkdown,
     rnaturalearth,
+    rnaturalearthdata,
     runjags,
     s2,
     scales,
