@@ -1,14 +1,11 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
-#  push:
-#    branches: [main, master]
-#  pull_request:
-#    branches: [main, master]
-      workflow_dispatch:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
-
-name: test-coverage
+name: Test coverage
 
 jobs:
   test-coverage:
@@ -17,7 +14,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -27,6 +24,29 @@ jobs:
         with:
           extra-packages: any::covr
           needs: coverage
+
+      - name: Install INLA binary
+        shell: bash
+        run: |
+          VERSION=$(grep '^Version:' DESCRIPTION | awk '{print $2}')
+          ARCH=$(uname -m)
+          BASE="https://inla.r-inla-download.org/Linux-builds"
+          ALL_FILES=$(curl -sf "${BASE}/FILES")
+          if [ "$ARCH" = "aarch64" ]; then
+            FILE=$(echo "$ALL_FILES" | grep "Ubuntu-24.04" | grep "Version_${VERSION}" | grep "aarch64" | head -1 || true)
+          else
+            FILE=$(echo "$ALL_FILES" | grep "Ubuntu-24.04" | grep "Version_${VERSION}" | grep -v "aarch64" | head -1 || true)
+          fi
+          if [ -z "$FILE" ]; then
+            echo "::warning::No Linux binary found for version ${VERSION}"
+            exit 0
+          fi
+          FILE_ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe='/'))" "$FILE")
+          mkdir -p inst/bin/linux
+          curl -Lf "${BASE}/${FILE_ENC}" | tar -xz -C inst/bin/linux/
+          if [ ! -f inst/bin/linux/64bit/inla.mkl ] && [ -f inst/bin/linux/64bit/inla.run ]; then
+            cp inst/bin/linux/64bit/inla.run inst/bin/linux/64bit/inla.mkl
+          fi
 
       - name: Test coverage
         run: |
@@ -40,13 +60,12 @@ jobs:
       - name: Show testthat output
         if: always()
         run: |
-          ## --------------------------------------------------------------------
           find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
       - name: Upload test results
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-test-failures
           path: ${{ runner.temp }}/package
