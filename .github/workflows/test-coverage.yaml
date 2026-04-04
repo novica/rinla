@@ -63,6 +63,10 @@ jobs:
           FILE_ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe='/'))" "$FILE")
           mkdir -p inst/bin/linux
           curl -Lf "${BASE}/${FILE_ENC}" | tar -xz -C inst/bin/linux/
+
+      - name: Ensure inla.mkl exists
+        shell: bash
+        run: |
           if [ ! -f inst/bin/linux/64bit/inla.mkl ] && [ -f inst/bin/linux/64bit/inla.run ]; then
             cp inst/bin/linux/64bit/inla.run inst/bin/linux/64bit/inla.mkl
           fi
