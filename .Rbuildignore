@@ -16,4 +16,5 @@
 ^doc$
 ^Meta$
 ^misc$
-^README\.Rmd$
+^\.lintr$
+^\.styler\.R$
