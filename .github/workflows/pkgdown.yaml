@@ -70,7 +70,7 @@ jobs:
             echo "::warning::No Linux binary found for version ${VERSION}"
             exit 0
           fi
-          FILE_ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe='/'))" "$FILE")
+          FILE_ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1].lstrip('./'), safe='/'))" "$FILE")
           mkdir -p inst/bin/linux
           curl -Lf "${BASE}/${FILE_ENC}" | tar -xz -C inst/bin/linux/
 
@@ -93,6 +93,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: docs
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
