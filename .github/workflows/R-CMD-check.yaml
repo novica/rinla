@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: main
+    branches: [main]
   pull_request:
-    branches: main
+    branches: [main]
 
 name: R-CMD-check
 
@@ -68,6 +68,11 @@ jobs:
           FILE_ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe='/'))" "$FILE")
           mkdir -p inst/bin/linux
           curl -Lf "${BASE}/${FILE_ENC}" | tar -xz -C inst/bin/linux/
+          # inla.mkl.run is a wrapper that calls inla.mkl (the MKL binary).
+          # The MKL binary is not in the standard download, so alias it to inla.run.
+          if [ ! -f inst/bin/linux/64bit/inla.mkl ] && [ -f inst/bin/linux/64bit/inla.run ]; then
+            cp inst/bin/linux/64bit/inla.run inst/bin/linux/64bit/inla.mkl
+          fi
 
       - name: Install INLA binary (macOS)
         if: runner.os == 'macOS'
