@@ -1,0 +1,106 @@
+name: Sync from upstream r-inla
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout rinla
+        uses: actions/checkout@v4
+
+      - name: Get latest tag from r-inla
+        id: upstream
+        run: |
+          LATEST_TAG=$(gh api repos/novica/r-inla/tags --jq '.[0].name')
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Get current package version
+        id: current
+        run: |
+          VERSION=$(grep '^Version:' DESCRIPTION | awk '{print $2}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if already up to date
+        id: check
+        run: |
+          if [ "${{ steps.upstream.outputs.tag }}" = "${{ steps.current.outputs.version }}" ]; then
+            echo "up_to_date=true" >> $GITHUB_OUTPUT
+            echo "Already at ${{ steps.upstream.outputs.tag }}, nothing to do."
+          else
+            echo "up_to_date=false" >> $GITHUB_OUTPUT
+            echo "Upstream: ${{ steps.upstream.outputs.tag }}, current: ${{ steps.current.outputs.version }}"
+          fi
+
+      - name: Check for existing PR
+        id: existing_pr
+        if: steps.check.outputs.up_to_date == 'false'
+        run: |
+          BRANCH="sync/r-inla-${{ steps.upstream.outputs.tag }}"
+          EXISTING=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "PR #$EXISTING already exists for $BRANCH"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Clone r-inla at tag
+        if: steps.check.outputs.up_to_date == 'false' && steps.existing_pr.outputs.exists == 'false'
+        run: |
+          git clone --depth 1 --branch "${{ steps.upstream.outputs.tag }}" \
+            https://github.com/novica/r-inla.git /tmp/r-inla
+
+      - name: Sync files from r-inla/rinla, resolving symlinks
+        if: steps.check.outputs.up_to_date == 'false' && steps.existing_pr.outputs.exists == 'false'
+        run: |
+          # -a: archive mode  -L: dereference symlinks (copies file content, not the symlink)
+          # --delete: remove files no longer in upstream
+          # Preserve .github/ so our workflows are not overwritten
+          rsync -aL --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            /tmp/r-inla/rinla/ ./
+
+      - name: Create pull request
+        if: steps.check.outputs.up_to_date == 'false' && steps.existing_pr.outputs.exists == 'false'
+        run: |
+          TAG="${{ steps.upstream.outputs.tag }}"
+          BRANCH="sync/r-inla-${TAG}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes after sync, nothing to commit."
+            exit 0
+          fi
+
+          git commit -m "Sync rinla from r-inla ${TAG}"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "Sync: r-inla ${TAG}" \
+            --body "Automated sync from [novica/r-inla](https://github.com/novica/r-inla) tag \`${TAG}\`.
+
+          Changes are taken from the \`rinla/\` subdirectory of the upstream repo.
+          Symlinks in \`inst/\` have been resolved to regular files (\`rsync -L\`).
+
+          **Before merging:** review \`DESCRIPTION\` for any dependency changes and check that the binary version \`${TAG}\` is available at https://inla.r-inla-download.org/Linux-builds/." \
+            --base main \
+            --head "$BRANCH"
+        env:
+          GH_TOKEN: ${{ github.token }}
