@@ -59,12 +59,16 @@ jobs:
             FILE=$(echo "$ALL_FILES" | grep "Ubuntu-24.04" | grep "Version_${VERSION}" | grep "aarch64" | head -1 || true)
           else
             FILE=$(echo "$ALL_FILES" | grep "Ubuntu-24.04" | grep "Version_${VERSION}" | grep -v "aarch64" | head -1 || true)
+            # Ubuntu-24.04 x86_64 is not always available; fall back to Ubuntu-22.04
+            if [ -z "$FILE" ]; then
+              FILE=$(echo "$ALL_FILES" | grep "Ubuntu-22.04" | grep "Version_${VERSION}" | grep -v "aarch64" | head -1 || true)
+            fi
           fi
           if [ -z "$FILE" ]; then
             echo "::warning::No Linux binary found for version ${VERSION}"
             exit 0
           fi
-          FILE_ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe='/'))" "$FILE")
+          FILE_ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1].lstrip('./'), safe='/'))" "$FILE")
           mkdir -p inst/bin/linux
           curl -Lf "${BASE}/${FILE_ENC}" | tar -xz -C inst/bin/linux/
 
@@ -76,7 +80,7 @@ jobs:
           fi
 
       - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages
