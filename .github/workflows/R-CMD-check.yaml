@@ -18,8 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
+#          - {os: macos-latest,   r: 'release'}
+#          - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
@@ -29,7 +29,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -41,8 +41,19 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: any::rcmdcheck, any::devtools
           needs: check
+
+      - name: Install INLA binary (Linux only)
+        if: runner.os == 'Linux'
+        shell: Rscript {0}
+        run: |
+          devtools::install(".", quick = TRUE, upgrade = "never", quiet = TRUE)
+          library(INLA)
+          INLA::inla.binary.install(os = "Ubuntu-24.04")
+          pa <- searchpaths()
+          pa <- pa[grep("/INLA$", pa)]
+          file.copy(file.path(pa, "bin", "linux"), "inst/bin/", recursive = TRUE, overwrite = TRUE)
 
       - uses: r-lib/actions/check-r-package@v2
         with:
