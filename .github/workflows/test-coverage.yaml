@@ -38,7 +38,7 @@ jobs:
 
       - name: Cache INLA binary
         id: cache-inla
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: inst/bin/linux
           key: inla-binary-linux-${{ runner.arch }}-${{ steps.pkg-version.outputs.version }}

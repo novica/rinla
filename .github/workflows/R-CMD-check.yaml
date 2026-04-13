@@ -61,7 +61,7 @@ jobs:
       - name: Cache INLA binary (Linux)
         if: runner.os == 'Linux'
         id: cache-inla-linux
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: inst/bin/linux
           key: inla-binary-linux-${{ runner.arch }}-${{ steps.pkg-version.outputs.version }}
@@ -104,7 +104,7 @@ jobs:
       - name: Cache INLA binary (macOS)
         if: runner.os == 'macOS'
         id: cache-inla-macos
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             inst/bin/mac
@@ -131,7 +131,7 @@ jobs:
       - name: Cache INLA binary (Windows)
         if: runner.os == 'Windows'
         id: cache-inla-windows
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: inst/bin/windows
           key: inla-binary-windows-${{ runner.arch }}-${{ steps.pkg-version.outputs.version }}
