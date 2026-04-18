@@ -86,7 +86,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Upload docs
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs
 
